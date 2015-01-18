@@ -43,6 +43,10 @@ tokens :-
     [\;]                              { tok (\p s -> TokSemicolon p) }
 
     [\=\+\-\*\/\(\)]                  { tok (\p s -> TokSym p (head s)) }
+    println                           { tok (\p s -> TokPrintln p) }
+
+    \"[^\"]*\"                         { tok (\p s -> TokString p s) }
+
     $alpha [$alpha $digit \_ \']*     { tok (\p s -> TokVar p s) }
 
 {
@@ -66,6 +70,8 @@ data Token = TokProgram     AlexPosn
            | TokComma       AlexPosn
            | TokSemicolon   AlexPosn
            | TokSym         AlexPosn Char
+           | TokPrintln     AlexPosn
+           | TokString      AlexPosn String
            | TokVar         AlexPosn String
            deriving (Eq,Show)
 
@@ -82,6 +88,7 @@ token_posn (TokCurlyClose p) = p
 token_posn (TokComma p) = p
 token_posn (TokSemicolon p) = p
 token_posn (TokSym p _) = p
+token_posn (TokPrintln p) = p
 token_posn (TokVar p _) = p
 
 main::IO ()
