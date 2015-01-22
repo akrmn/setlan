@@ -16,8 +16,8 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 executable setlan
-  main-is:             setlan.hs
-  -- other-modules:
+  main-is:             Main.hs
+  other-modules:       Tokens Lexer
   -- other-extensions:
   build-depends:       base >=4.7 && <4.8,
                        array >=0.5
