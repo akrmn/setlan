@@ -1,6 +1,7 @@
 {
 module Main (Token(..), AlexPosn(..), alexScanTokens, token_posn, main) where
 import System.Environment
+import System.IO
 }
 
 -- Positional wrapper
@@ -139,22 +140,23 @@ token_posn(TokPrintln p) = p
 token_posn(TokString p _) = p
 token_posn(TokVar p _) = p
 
+fromFile::FilePath -> IO()
+fromFile filename = do
+    putStrLn ("\n<<Tokenizing " ++ filename  ++ ">>\n")
+    handle <- openFile (filename) ReadMode
+    s <- hGetContents handle
+    let toks = alexScanTokens s
+    mapM_ print toks
+
 main::IO ()
 main = do
-    {-|
-        Me gustaría que el Lexer funcionara tanto después de un pipe (leyendo
-        de stdin, que lo hace con getContents), como con un argumento con el
-        nombre del archivo (usando getArgs y luego algo que lea el archivo).
-
-        Por ahora el programa se usa así:
-            cat <archivo.stl> | ./Tokens
-    -}
-    s <- getContents
-    let toks = alexScanTokens s
-
-    {-|
-        También me gustaría cambiar el print para que se parezca más al de
-        ellos, aunque no va a ser idéntico por cómo funciona Haskell
-    -}
-    mapM_ print toks
+    let s = ""
+    args <- getArgs
+    if length args == 0
+        then do
+            s <- getContents
+            let toks = alexScanTokens s
+            mapM_ print toks
+        else do
+            mapM_ fromFile args
 }
