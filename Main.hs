@@ -5,21 +5,15 @@ import Tokens
 import System.Environment
 import System.IO
 
-fromFile :: FilePath -> IO()
-fromFile filename = do
-    handle <- openFile (filename) ReadMode
-    s <- hGetContents handle
-    let toks = alexScanTokens s
+lexr :: String -> IO ()
+lexr text = do
+    let toks = alexScanTokens text
     mapM_ print toks
 
 main :: IO ()
 main = do
-    let s = ""
     args <- getArgs
-    if length args == 0
-        then do
-            s <- getContents
-            let toks = alexScanTokens s
-            mapM_ print toks
-        else do
-            mapM_ fromFile args
+    s <- if length args == 0
+        then getContents
+        else hGetContents =<< (openFile (args!!0) ReadMode)
+    lexr s
