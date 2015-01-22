@@ -19,10 +19,10 @@ tokens :-
     using                               { tok (\p s -> TokUsing p) }
     in                                  { tok (\p s -> TokIn p) }
     int                                 { tok (\p s -> TokIntT p) }
-    $digit+                             { tok (\p s -> TokInt p (read s)) }
+    $digit+                             { tok (\p s -> TokInt (read s) p ) }
     bool                                { tok (\p s -> TokBoolT p) }
-    [Tt]rue                             { tok (\p s -> TokBool p True) }
-    [Ff]alse                            { tok (\p s -> TokBool p False) }
+    [Tt]rue                             { tok (\p s -> TokBool True p) }
+    [Ff]alse                            { tok (\p s -> TokBool False p) }
     set                                 { tok (\p s -> TokSetT p) }
     [\{]                                { tok (\p s -> TokCurlyOpen p) }
     [\}]                                { tok (\p s -> TokCurlyClose p) }
@@ -32,12 +32,12 @@ tokens :-
     [\;]                                { tok (\p s -> TokSemicolon p) }
     [\:]                                { tok (\p s -> TokColon p) }
     [=]                                 { tok (\p s -> TokAssign p) }
-    [\+\-\*\/\%]                        { tok (\p s -> TokIntOp p s) }
-    (\+\+)|(\\)|(\>\<)                  { tok (\p s -> TokSetBinOp p s) }
-    [\>\<\$]\?                          { tok (\p s -> TokSetUnOp p s) }
-    \<[\+\-\*\/\%]\>                    { tok (\p s -> TokMapOp p s) }
-    (and)|(or)|(not)                    { tok (\p s -> TokBoolOp p s) }
-    (\<=?)|(\>=?)|(==)|(\/=)|@          { tok (\p s -> TokRelOp p s) }
+    [\+\-\*\/\%]                        { tok (\p s -> TokIntOp s p) }
+    (\+\+)|(\\)|(\>\<)                  { tok (\p s -> TokSetBinOp s p) }
+    [\>\<\$]\?                          { tok (\p s -> TokSetUnOp s p) }
+    \<[\+\-\*\/\%]\>                    { tok (\p s -> TokMapOp s p) }
+    (and)|(or)|(not)                    { tok (\p s -> TokBoolOp s p) }
+    (\<=?)|(\>=?)|(==)|(\/=)|@          { tok (\p s -> TokRelOp s p) }
     if                                  { tok (\p s -> TokIf p) }
     then                                { tok (\p s -> TokThen p) }
     else                                { tok (\p s -> TokElse p) }
@@ -53,60 +53,60 @@ tokens :-
     scan                                { tok (\p s -> TokScan p) }
     print                               { tok (\p s -> TokPrint p) }
     println                             { tok (\p s -> TokPrintln p) }
-    \"[^\"]*\"                          { tok (\p s -> TokString p (read s)) }
-    $alpha [$alpha $digit \_ \']*       { tok (\p s -> TokVar p s) }
+    \"[^\"]*\"                          { tok (\p s -> TokString (read s) p) }
+    $alpha [$alpha $digit \_ \']*       { tok (\p s -> TokVar s p) }
 
 {
 tok f p s = f p s
 
-data Token = TokProgram AlexPosn
-           | TokUsing AlexPosn
-           | TokIn AlexPosn
-           | TokIntT AlexPosn
-           | TokInt AlexPosn Int
-           | TokBoolT AlexPosn
-           | TokBool AlexPosn Bool
-           | TokSetT AlexPosn
-           | TokCurlyOpen AlexPosn
-           | TokCurlyClose AlexPosn
-           | TokParenOpen AlexPosn
-           | TokParenClose AlexPosn
-           | TokComma AlexPosn
-           | TokSemicolon AlexPosn
-           | TokColon AlexPosn
-           | TokAssign AlexPosn
-           | TokIntOp AlexPosn String
-           | TokSetBinOp AlexPosn String
-           | TokSetUnOp AlexPosn String
-           | TokMapOp AlexPosn String
-           | TokBoolOp AlexPosn String
-           | TokRelOp AlexPosn String
-           | TokIf AlexPosn
-           | TokThen AlexPosn
-           | TokElse AlexPosn
-           | TokFor AlexPosn
-           | TokMin AlexPosn
-           | TokMax AlexPosn
-           | TokRepeat AlexPosn
-           | TokWhile AlexPosn
-           | TokDo AlexPosn
-           | TokDef AlexPosn
-           | TokArrow AlexPosn
-           | TokReturn AlexPosn
-           | TokScan AlexPosn
-           | TokPrint AlexPosn
-           | TokPrintln AlexPosn
-           | TokString AlexPosn String
-           | TokVar AlexPosn String
+data Token = TokProgram                 AlexPosn
+           | TokUsing                   AlexPosn
+           | TokIn                      AlexPosn
+           | TokIntT                    AlexPosn
+           | TokInt         Int         AlexPosn
+           | TokBoolT                   AlexPosn
+           | TokBool        Bool        AlexPosn
+           | TokSetT                    AlexPosn
+           | TokCurlyOpen               AlexPosn
+           | TokCurlyClose              AlexPosn
+           | TokParenOpen               AlexPosn
+           | TokParenClose              AlexPosn
+           | TokComma                   AlexPosn
+           | TokSemicolon               AlexPosn
+           | TokColon                   AlexPosn
+           | TokAssign                  AlexPosn
+           | TokIntOp       String      AlexPosn
+           | TokSetBinOp    String      AlexPosn
+           | TokSetUnOp     String      AlexPosn
+           | TokMapOp       String      AlexPosn
+           | TokBoolOp      String      AlexPosn
+           | TokRelOp       String      AlexPosn
+           | TokIf                      AlexPosn
+           | TokThen                    AlexPosn
+           | TokElse                    AlexPosn
+           | TokFor                     AlexPosn
+           | TokMin                     AlexPosn
+           | TokMax                     AlexPosn
+           | TokRepeat                  AlexPosn
+           | TokWhile                   AlexPosn
+           | TokDo                      AlexPosn
+           | TokDef                     AlexPosn
+           | TokArrow                   AlexPosn
+           | TokReturn                  AlexPosn
+           | TokScan                    AlexPosn
+           | TokPrint                   AlexPosn
+           | TokPrintln                 AlexPosn
+           | TokString      String      AlexPosn
+           | TokVar         String      AlexPosn
            deriving (Eq, Show)
 
 token_posn(TokProgram p) = p
 token_posn(TokUsing p) = p
 token_posn(TokIn p) = p
 token_posn(TokIntT p) = p
-token_posn(TokInt p _) = p
+token_posn(TokInt _ p) = p
 token_posn(TokBoolT p) = p
-token_posn(TokBool p _) = p
+token_posn(TokBool _ p) = p
 token_posn(TokSetT p) = p
 token_posn(TokCurlyOpen p) = p
 token_posn(TokCurlyClose p) = p
@@ -116,12 +116,12 @@ token_posn(TokComma p) = p
 token_posn(TokSemicolon p) = p
 token_posn(TokColon p) = p
 token_posn(TokAssign p) = p
-token_posn(TokIntOp p _) = p
-token_posn(TokSetBinOp p _) = p
-token_posn(TokSetUnOp p _) = p
-token_posn(TokMapOp p _) = p
-token_posn(TokBoolOp p _) = p
-token_posn(TokRelOp p _) = p
+token_posn(TokIntOp _ p) = p
+token_posn(TokSetBinOp _ p) = p
+token_posn(TokSetUnOp _ p) = p
+token_posn(TokMapOp _ p) = p
+token_posn(TokBoolOp _ p) = p
+token_posn(TokRelOp _ p) = p
 token_posn(TokIf p) = p
 token_posn(TokThen p) = p
 token_posn(TokElse p) = p
@@ -137,8 +137,8 @@ token_posn(TokReturn p) = p
 token_posn(TokScan p) = p
 token_posn(TokPrint p) = p
 token_posn(TokPrintln p) = p
-token_posn(TokString p _) = p
-token_posn(TokVar p _) = p
+token_posn(TokString _ p) = p
+token_posn(TokVar _ p) = p
 
 fromFile::FilePath -> IO()
 fromFile filename = do
