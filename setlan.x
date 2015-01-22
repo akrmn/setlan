@@ -1,22 +1,16 @@
---Revisa esto:
---    https://leanpub.com/alexandhappy/read#leanpub-auto-a-basic-lexer
---explica más o menos qué hace Alex. No está completo pero por ahora sirve.
-
 {
 module Main (Token(..), AlexPosn(..), alexScanTokens, token_posn, main) where
 import System.Environment
 }
 
---Este wrapper devuelve las posiciones de los tokens, que es una de las cosas
---que piden.
+-- Positional wrapper
 %wrapper "posn"
 
---Estos son los macros
+-- Macros
 $digit = 0-9            -- digits
 $alpha = [a-zA-Z]       -- alphabetic characters
 
---Aquí vienen los tokens, que se parecen un poco a las producciones de las
---gramáticas de Ascander.
+-- Each right-hand side has type :: AlexPosn -> String -> Token
 tokens :-
     $white+                             ;
     "#".*                               ;
@@ -62,12 +56,8 @@ tokens :-
     $alpha [$alpha $digit \_ \']*       { tok (\p s -> TokVar p s) }
 
 {
--- Each right-hand side has type :: AlexPosn -> String -> Token
-
--- Some action helpers: (no sé qué hace esto, venía en el ejemplo de Alex .-.)
 tok f p s = f p s
 
--- The token type:
 data Token = TokProgram AlexPosn
            | TokUsing AlexPosn
            | TokIn AlexPosn
