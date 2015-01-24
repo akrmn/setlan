@@ -1,3 +1,9 @@
+-- CI 3725 Traductores e interpretadores
+-- Project part 1 lexer
+-- Members:
+--         Moises Ackerman 11-10005
+--         Carlos Ferreira 11-10323
+
 module Main (main) where
 
 import Lexer
@@ -5,6 +11,7 @@ import Tokens
 import System.Environment
 import System.IO
 
+-- Verification of lexer
 lexr :: String -> IO ()
 lexr text = do
     let toks = alexScanTokens text
@@ -12,6 +19,7 @@ lexr text = do
         then mapM_ print toks
         else printError toks
 
+-- Prints the errors if they exist
 printError :: [Token] -> IO ()
 printError s = do
 	mapM_ print $ listErrors s
