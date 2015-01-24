@@ -1,3 +1,9 @@
+-- CI 3725 Traductores e interpretadores
+-- Project part 1 lexer
+-- Members:
+--         Moises Ackerman 11-10005
+--         Carlos Ferreira 11-10323
+
 module Tokens where
 
 data Pos = Pos Int Int deriving (Eq, Show)
@@ -45,6 +51,7 @@ data Token = TokenProgram             Pos
            | TokenError       String  Pos
            deriving (Eq, Show)
 
+-- See if occurs an error
 isError :: Token -> Bool
 isError t
     = case t of
