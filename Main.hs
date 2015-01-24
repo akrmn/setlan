@@ -8,7 +8,13 @@ import System.IO
 lexr :: String -> IO ()
 lexr text = do
     let toks = alexScanTokens text
-    mapM_ print toks
+    if noError toks
+        then mapM_ print toks
+        else printError toks
+
+printError :: [Token] -> IO ()
+printError s = do
+	mapM_ print $ listErrors s
 
 main :: IO ()
 main = do
