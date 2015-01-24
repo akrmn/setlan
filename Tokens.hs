@@ -45,6 +45,18 @@ data Token = TokenProgram             Pos
            | TokenError       String  Pos
            deriving (Eq, Show)
 
+isError :: Token -> Bool
+isError t
+    = case t of
+        TokenError _ _ -> True
+        _              -> False
+
+noError :: [Token] -> Bool
+noError l = null $ listErrors l
+
+listErrors :: [Token] -> [Token]
+listErrors l = filter isError l
+
 token_posn :: Token -> Pos
 token_posn t =
     case t of
