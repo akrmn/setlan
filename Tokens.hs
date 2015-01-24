@@ -2,102 +2,149 @@ module Tokens where
 
 data Pos = Pos Int Int deriving (Eq, Show)
 
-data Token = TokenProgram             Pos
-           | TokenUsing               Pos
-           | TokenIn                  Pos
-           | TokenIntT                Pos
-           | TokenInt         Int     Pos
-           | TokenBoolT               Pos
-           | TokenTrue                Pos
-           | TokenFalse               Pos
-           | TokenSetT                Pos
-           | TokenCurlyOpen           Pos
-           | TokenCurlyClose          Pos
-           | TokenParenOpen           Pos
-           | TokenParenClose          Pos
-           | TokenComma               Pos
-           | TokenSemicolon           Pos
-           | TokenColon               Pos
-           | TokenAssign              Pos
-           | TokenIntOp       String  Pos
-           | TokenSetBinOp    String  Pos
-           | TokenSetUnOp     String  Pos
-           | TokenMapOp       String  Pos
-           | TokenBoolOp      String  Pos
-           | TokenRelOp       String  Pos
-           | TokenIf                  Pos
-           | TokenThen                Pos
-           | TokenElse                Pos
-           | TokenFor                 Pos
-           | TokenMin                 Pos
-           | TokenMax                 Pos
-           | TokenRepeat              Pos
-           | TokenWhile               Pos
-           | TokenDo                  Pos
-           | TokenDef                 Pos
-           | TokenArrow               Pos
-           | TokenReturn              Pos
-           | TokenScan                Pos
-           | TokenPrint               Pos
-           | TokenPrintln             Pos
-           | TokenString      String  Pos
-           | TokenVar         String  Pos
-           | TokenError       String  Pos
-           deriving (Eq, Show)
+data Token
+    -- language --
+    = TokenProgram Pos | TokenUsing Pos | TokenIn    Pos
+    | TokenAssign  Pos | TokenDef   Pos | TokenArrow Pos
+    | TokenReturn  Pos
 
-isError :: Token -> Bool
-isError t
-    = case t of
-        TokenError _ _ -> True
-        _              -> False
+    -- brackets --
+    | TokenCurlyOpen Pos | TokenCurlyClose Pos
+    | TokenParenOpen Pos | TokenParenClose Pos
 
-noError :: [Token] -> Bool
-noError l = null $ listErrors l
+    -- types --
+    | TokenIntT Pos | TokenBoolT Pos | TokenSetT Pos
 
-listErrors :: [Token] -> [Token]
-listErrors l = filter isError l
+    -- boolean constants --
+    | TokenTrue Pos | TokenFalse Pos
+
+    -- separators --
+    | TokenComma Pos | TokenSemicolon Pos
+
+    -- operators --
+    -- -- int --
+    | TokenPlus Pos | TokenMinus Pos | TokenTimes Pos
+    | TokenDiv  Pos | TokenMod   Pos
+
+    -- -- set  --
+    | TokenSetUnion Pos | TokenSetMinus Pos | TokenSetInter Pos
+    | TokenSetMax   Pos | TokenSetMin   Pos | TokenSetSize  Pos
+
+    -- -- map --
+    | TokenMapPlus  Pos | TokenMapMinus Pos | TokenMapTimes Pos
+    | TokenMapDiv   Pos | TokenMapMod   Pos
+
+    -- -- bool --
+    | TokenAnd Pos | TokenOr Pos | TokenNot Pos
+
+    -- -- relational --
+    | TokenLT Pos | TokenLE Pos | TokenGT Pos | TokenGE Pos
+    | TokenEQ Pos | TokenNE Pos | TokenAt Pos
+
+    -- control statements --
+    | TokenIf     Pos | TokenThen  Pos | TokenElse Pos
+    | TokenFor    Pos | TokenMin   Pos | TokenMax  Pos
+    | TokenRepeat Pos | TokenWhile Pos | TokenDo   Pos
+
+    -- IO functions --
+    | TokenScan Pos | TokenPrint Pos | TokenPrintln Pos
+
+    -- variables --
+    | TokenInt    Int    Pos
+    | TokenString String Pos
+    | TokenIdent  String Pos
+
+    -- error --
+    | TokenError  String Pos
+    deriving (Eq, Show)
 
 token_posn :: Token -> Pos
-token_posn t =
-    case t of
-        (TokenProgram p)        -> p
-        (TokenUsing p)          -> p
-        (TokenIn p)             -> p
-        (TokenIntT p)           -> p
-        (TokenInt _ p)          -> p
-        (TokenBoolT p)          -> p
-        (TokenTrue p)           -> p
-        (TokenFalse p)          -> p
-        (TokenSetT p)           -> p
-        (TokenCurlyOpen p)      -> p
-        (TokenCurlyClose p)     -> p
-        (TokenParenOpen p)      -> p
-        (TokenParenClose p)     -> p
-        (TokenComma p)          -> p
-        (TokenSemicolon p)      -> p
-        (TokenColon p)          -> p
-        (TokenAssign p)         -> p
-        (TokenIntOp _ p)        -> p
-        (TokenSetBinOp _ p)     -> p
-        (TokenSetUnOp _ p)      -> p
-        (TokenMapOp _ p)        -> p
-        (TokenBoolOp _ p)       -> p
-        (TokenRelOp _ p)        -> p
-        (TokenIf p)             -> p
-        (TokenThen p)           -> p
-        (TokenElse p)           -> p
-        (TokenFor p)            -> p
-        (TokenMin p)            -> p
-        (TokenMax p)            -> p
-        (TokenRepeat p)         -> p
-        (TokenWhile p)          -> p
-        (TokenDo p)             -> p
-        (TokenDef p)            -> p
-        (TokenArrow p)          -> p
-        (TokenReturn p)         -> p
-        (TokenScan p)           -> p
-        (TokenPrint p)          -> p
-        (TokenPrintln p)        -> p
-        (TokenString _ p)       -> p
-        (TokenVar _ p)          -> p
-        (TokenError _ p)        -> p
+token_posn t = case t of
+    -- language --
+    (TokenProgram p) -> p
+    (TokenUsing p) -> p
+    (TokenIn p) -> p
+    (TokenAssign p) -> p
+    (TokenDef p) -> p
+    (TokenArrow p) -> p
+    (TokenReturn p) -> p
+
+    -- brackets --
+    (TokenCurlyOpen p) -> p
+    (TokenCurlyClose p) -> p
+    (TokenParenOpen p) -> p
+    (TokenParenClose p) -> p
+
+    -- types --
+    (TokenIntT p) -> p
+    (TokenBoolT p) -> p
+    (TokenSetT p) -> p
+
+    -- boolean constants --
+    (TokenTrue p) -> p
+    (TokenFalse p) -> p
+
+    -- separators --
+    (TokenComma p) -> p
+    (TokenSemicolon p) -> p
+
+    -- operators --
+    -- -- int --
+    (TokenPlus p) -> p
+    (TokenMinus p) -> p
+    (TokenTimes p) -> p
+    (TokenDiv p) -> p
+    (TokenMod p) -> p
+
+    -- -- set  --
+    (TokenSetUnion p) -> p
+    (TokenSetMinus p) -> p
+    (TokenSetInter p) -> p
+    (TokenSetMax p) -> p
+    (TokenSetMin p) -> p
+    (TokenSetSize p) -> p
+
+    -- -- map --
+    (TokenMapPlus p) -> p
+    (TokenMapMinus p) -> p
+    (TokenMapTimes p) -> p
+    (TokenMapDiv p) -> p
+    (TokenMapMod p) -> p
+
+    -- -- bool --
+    (TokenAnd p) -> p
+    (TokenOr p) -> p
+    (TokenNot p) -> p
+
+    ---- -- relational --
+    (TokenLT p) -> p
+    (TokenLE p) -> p
+    (TokenGT p) -> p
+    (TokenGE p) -> p
+    (TokenEQ p) -> p
+    (TokenNE p) -> p
+    (TokenAt p) -> p
+
+    -- control statements --
+    (TokenIf p) -> p
+    (TokenThen p) -> p
+    (TokenElse p) -> p
+    (TokenFor p) -> p
+    (TokenMin p) -> p
+    (TokenMax p) -> p
+    (TokenRepeat p) -> p
+    (TokenWhile p) -> p
+    (TokenDo p) -> p
+
+    -- IO functions --
+    (TokenScan p) -> p
+    (TokenPrint p) -> p
+    (TokenPrintln p) -> p
+
+    -- variables --
+    (TokenInt _ p) -> p
+    (TokenString _ p) -> p
+    (TokenIdent  _ p) -> p
+
+    -- error --
+    (TokenError _ p) -> p

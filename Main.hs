@@ -5,6 +5,18 @@ import Tokens
 import System.Environment
 import System.IO
 
+isError :: Token -> Bool
+isError t
+    = case t of
+        TokenError _ _ -> True
+        _              -> False
+
+noError :: [Token] -> Bool
+noError l = null $ listErrors l
+
+listErrors :: [Token] -> [Token]
+listErrors l = filter isError l
+
 lexr :: String -> IO ()
 lexr text = do
     let toks = alexScanTokens text
