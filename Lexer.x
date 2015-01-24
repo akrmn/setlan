@@ -1,3 +1,9 @@
+-- CI3725 Traductores e interpretadores
+-- Project part 1 - Lexer
+-- Members:
+--         Moises Ackerman 11-10005
+--         Carlos Ferreira 11-10323
+
 {
 module Lexer (AlexPosn(..), alexScanTokens, token_posn) where
 import Tokens
