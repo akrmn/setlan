@@ -18,13 +18,17 @@ isError t
         TokenError _ _ -> True
         _              -> False
 
+listErrors :: [Token] -> [Token]
+-- Returns only the TokenErrors in a [Token]
+listErrors l = filter isError l
+
 noError :: [Token] -> Bool
 -- Checks whether a list of tokens contains a TokenError
 noError l = null $ listErrors l
 
-listErrors :: [Token] -> [Token]
--- Returns only the TokenErrors in a [Token]
-listErrors l = filter isError l
+printError :: Token -> IO ()
+printError (TokenError s p) = do
+    putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
 
 lexr :: String -> IO ()
 -- Calls the Alex token scanner and then prints found tokens. If there are any
@@ -33,11 +37,7 @@ lexr text = do
     let toks = alexScanTokens text
     if noError toks
         then mapM_ print toks
-        else printError toks
-
-printError :: [Token] -> IO ()
-printError s = do
-	mapM_ print $ listErrors s
+        else mapM_ printError $ listErrors toks
 
 main :: IO ()
 main = do
