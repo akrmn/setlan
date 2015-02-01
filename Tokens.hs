@@ -6,7 +6,9 @@
 
 module Tokens where
 
-data Pos = Pos Int Int deriving (Eq, Show)
+data Pos = Pos Int Int deriving Eq
+instance Show Pos where
+    show (Pos l c) = "(Line " ++ show l ++ ", Col " ++ show c ++ ")"
 
 data Token
     -- language --
