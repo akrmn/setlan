@@ -104,7 +104,7 @@ tokens :-
 
     -- variables --
     $digit+                   { toq TokenInt read }
-    \"[^\"]*\"                { toq TokenString read }
+    \"([^\"]|(\"))*\"         { toq TokenString read }
     $alpha[$alpha$digit\_\']* { toq TokenIdent id }
 
     -- error --
