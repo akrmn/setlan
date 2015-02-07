@@ -1,20 +1,21 @@
+## CI3725 Traductores e interpretadores
 # setlan
 
-## Miembros
+### Members
 11-10005 - Moisés Ackerman
 
 11-10323 - Carlos Ferreira
 
-## Decisiones de implementación
-Decidimos utilizar Haskell por su poderosa notación funcional y por las
-facilidades de Alex y Happy.
+### Implementation decisions
+We chose Haskell for its powerful functional notation, and because of the
+ease of use of the tools Alex and Happy.
 
-## Estado actual del proyecto
-El Lexer está listo, y sólo imprime los errores cuando existe alguno.
+### Current Status
+The Lexer is working as expected.
 
-## Problemas presentes
-Ninguno por ahora.
+### Problems?
+None yet.
 
-## Cualquier comentario respecto al proyecto que consideren necesario
-El formato de la salida no es exactamente el mismo del enunciado, pero la
-información contenida es exactamente la misma.
+### Other comments
+The output format is not identical to the one in the project statement, but the
+infomation it presents is equivalent.
