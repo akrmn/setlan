@@ -20,7 +20,8 @@ executable setlan
   other-modules:       Tokens Lexer
   -- other-extensions:
   build-depends:       base >=4.7 && <4.8,
-                       array >=0.5
+                       array >=0.5,
+                       derive
   build-tools:         alex
   -- hs-source-dirs:
   default-language:    Haskell2010

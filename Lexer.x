@@ -5,7 +5,7 @@
 --         Carlos Ferreira 11-10323
 
 {
-module Lexer (AlexPosn(..), alexScanTokens, token_posn) where
+module Lexer (lexer) where
 import Tokens
 }
 
@@ -117,5 +117,24 @@ toq f g p s = f (g s) (toPos p)
 
 toPos :: AlexPosn -> Pos
 toPos (AlexPn _ line column) = Pos line column
+
+hasError :: [Token] -> Bool
+-- Checks whether a list of tokens contains a TokenError
+hasError []                   = False
+hasError (TokenError _ _ : l) = True
+hasError (_ : l )             = hasError l
+
+printError :: Token -> IO ()
+printError (TokenError s p) = do
+    putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
+
+lexer :: String -> IO ()
+-- Calls the Alex token scanner and then prints found tokens. If there are any
+-- TokenErrors, it only prints those.
+lexer text = do
+    let toks = alexScanTokens text
+    if hasError toks
+        then mapM_ printError $ filter isTokenError toks
+        else mapM_ print toks
 
 }
