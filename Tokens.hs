@@ -1,9 +1,3 @@
--- CI3725 Traductores e interpretadores
--- Project part 1 - Lexer
--- Members:
---         Moises Ackerman 11-10005
---         Carlos Ferreira 11-10323
-
 {-# LANGUAGE TemplateHaskell #-}
 
 module Tokens where
@@ -16,9 +10,9 @@ instance Show Pos where
 
 data Token
     -- language --
-    = TokenProgram Pos | TokenUsing Pos | TokenIn    Pos
-    | TokenAssign  Pos | TokenDef   Pos | TokenArrow Pos
-    | TokenReturn  Pos
+    = TokenProgram Pos | TokenUsing Pos   | TokenIn    Pos
+    | TokenAssign  Pos {-| TokenDef   Pos | TokenArrow Pos
+    | TokenReturn  Pos -}
 
     -- brackets --
     | TokenCurlyOpen Pos | TokenCurlyClose Pos
@@ -62,7 +56,7 @@ data Token
     | TokenScan Pos | TokenPrint Pos | TokenPrintln Pos
 
     -- variables --
-    | TokenInt    Int    Pos
+    | TokenInt    String Pos
     | TokenString String Pos
     | TokenIdent  String Pos
 
@@ -78,9 +72,9 @@ token_posn t = case t of
     (TokenUsing p) -> p
     (TokenIn p) -> p
     (TokenAssign p) -> p
-    (TokenDef p) -> p
-    (TokenArrow p) -> p
-    (TokenReturn p) -> p
+    -- (TokenDef p) -> p
+    -- (TokenArrow p) -> p
+    -- (TokenReturn p) -> p
 
     -- brackets --
     (TokenCurlyOpen p) -> p

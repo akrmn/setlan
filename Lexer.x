@@ -1,11 +1,10 @@
--- CI3725 Traductores e interpretadores
--- Project part 1 - Lexer
--- Members:
---         Moises Ackerman 11-10005
---         Carlos Ferreira 11-10323
-
 {
-module Lexer (lexer) where
+module Lexer
+(
+    lexer,
+    printError,
+    alexScanTokens
+) where
 import Tokens
 }
 
@@ -26,9 +25,9 @@ tokens :-
     using       { tok TokenUsing }
     in          { tok TokenIn }
     =           { tok TokenAssign }
-    def         { tok TokenDef }
-    \-\>        { tok TokenArrow }          -- ->
-    return      { tok TokenReturn }
+    -- def         { tok TokenDef }
+    -- \-\>        { tok TokenArrow }          -- ->
+    -- return      { tok TokenReturn }
 
     -- brackets --
     [\{]        { tok TokenCurlyOpen }      -- {
@@ -77,7 +76,7 @@ tokens :-
     or          { tok TokenOr }
     not         { tok TokenNot }
 
-    ---- -- relational --
+    -- -- relational --
     \<          { tok TokenLT }             -- <
     \<=         { tok TokenLE }             -- <=
     \>          { tok TokenGT }             -- >
@@ -103,7 +102,7 @@ tokens :-
     println     { tok TokenPrintln }
 
     -- variables --
-    $digit+                   { toq TokenInt read }
+    $digit+                   { toq TokenInt id }
     \"([^\"]|(\"))*\"         { toq TokenString read }
     $alpha[$alpha$digit\_\']* { toq TokenIdent id }
 
@@ -112,17 +111,11 @@ tokens :-
 
 {
 
-tok  f p s = f (toPos p)
+tok f p s   = f (toPos p)
 toq f g p s = f (g s) (toPos p)
 
 toPos :: AlexPosn -> Pos
 toPos (AlexPn _ line column) = Pos line column
-
-hasError :: [Token] -> Bool
--- Checks whether a list of tokens contains a TokenError
-hasError []                   = False
-hasError (TokenError _ _ : l) = True
-hasError (_ : l )             = hasError l
 
 printError :: Token -> IO ()
 printError (TokenError s p) = do
@@ -133,7 +126,7 @@ lexer :: String -> IO ()
 -- TokenErrors, it only prints those.
 lexer text = do
     let toks = alexScanTokens text
-    if hasError toks
+    if any isTokenError toks
         then mapM_ printError $ filter isTokenError toks
         else mapM_ print toks
 
