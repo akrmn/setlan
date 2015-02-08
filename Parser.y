@@ -162,12 +162,13 @@ Exp : Exp '+'   Exp                     { Plus $1 $3 }
     |     '-'   Exp %prec NEG           { Negative $2 }
 
     | '(' Exp ')'                       { $2 }
-    | num                               { Number $1 }
-    | true                              { BoolTrue }
-    | false                             { BoolFalse }
-    | id                                { Var $1 }
+    | num                               { Number (extract $1) }
+    | Bool                              { Boolean $1 }
+    | id                                { Var (extract $1) }
     | '{' Conts '}'                     { Set $2 }
-    | str                               { Strng $1 }
+    | str                               { Strng (extract $1) }
+
+Bool : true {True} | false {False}
 
 Conts : Exp ',' Conts                   { $1 : $3 }
       | Exp                             { [$1] }
@@ -176,14 +177,14 @@ Conts : Exp ',' Conts                   { $1 : $3 }
 Insts : Inst ';' Insts                  { $1 : $3 }
       |                                 { [] }
 
-Inst : id '=' Exp                       { Assign  $1 $3 }
+Inst : id '=' Exp                       { Assign (extract $1) $3 }
 
      | '{' using Declares in Insts '}'  { Block (Just $3) $5 }
      | '{' Insts '}'                    { Block Nothing   $2 }
 
-     | scan id                          { Scan    $2 }
+     | scan id                          { Scan    (extract $2) }
      | print Conts                      { Print   $2 }
-     | println Conts                    { Print  ($2 ++ [Strng newline]) }
+     | println Conts                    { Print  ($2 ++ [Strng "\n"]) }
 
      | if Exp Inst else Inst            { If  $2 $3 (Just $5) }
      | if Exp Inst                      { If  $2 $3 Nothing }
@@ -192,12 +193,12 @@ Inst : id '=' Exp                       { Assign  $1 $3 }
      | while Exp do Inst                { WhileDo $2 $4 }
      | repeat Inst while Exp            { Repeat  $2 $4 }
 
-     | for id Dir Exp do Inst           { For $2 $3 $4 $6 }
+     | for id Dir Exp do Inst           { For (extract $2) $3 $4 $6 }
 
 Dir : min { Min }
     | max { Max }
 
-Declares : Declare ';' Declares         { $1 : $3 }
+Declares : Declare ';' Declares         {  $1 : $3 }
          | Declare ';'                  { [$1] }
 
 Declare : Type Variables                { Declare $1 $2 }
@@ -206,10 +207,15 @@ Type : bool                             { BoolType }
      | int                              { IntType }
      | set                              { SetType }
 
-Variables : id ',' Variables            { $1 : $3 }
-          | id                          { [$1] }
+Variables : id ',' Variables            {  (extract $1) : $3 }
+          | id                          { [(extract $1)] }
 
 {
+
+extract :: Token -> String
+extract (TokenString s _) = s
+extract (TokenIdent s _) = s
+extract (TokenInt s _)   = s
 
 newline = TokenString "\n" (Pos 0 0)
 
@@ -226,6 +232,7 @@ parser text = do
     let toks = alexScanTokens text
     if any isTokenError toks
         then mapM_ printError $ filter isTokenError toks
+        -- else putStrLn . show' . parsr $ toks
         else printAST toks
 
 }
