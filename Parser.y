@@ -176,9 +176,9 @@ Inst : id '=' Exp                       { Assign  $1 $3 }
      | '{' Insts '}'                    { Block $2 }
      | scan id                          { Scan    $2 }
      | print Printables                 { Print   $2 }
-     -- | println Printables               { Print  ($2 ++ (Strng '\n')) }
-     | if Exp then Inst else Inst       { IfElse  $2 $4 $6 }
-     | if Exp then Inst                 { If      $2 $4 }
+     | println Printables               { Print  ($2 ++ [Strng newline]) }
+     | if Exp Inst else Inst            { IfElse  $2 $3 $5 }
+     | if Exp Inst                      { If      $2 $3 }
      | repeat Inst while Exp do Inst    { RWD     $2 $4 $6 }
      | while Exp do Inst                { WhileDo $2 $4 }
      | repeat Inst while Exp            { Repeat  $2 $4 }
@@ -204,6 +204,8 @@ Variables : Variables ',' id            { $1 ++ [$3] }
           | id                          { [$1] }
 
 {
+
+newline = TokenString "\n" (Pos 0 0)
 
 parseError :: [Token] -> a
 parseError l = case l of
