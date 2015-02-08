@@ -11,8 +11,7 @@ instance Show Pos where
 data Token
     -- language --
     = TokenProgram Pos | TokenUsing Pos   | TokenIn    Pos
-    | TokenAssign  Pos {-| TokenDef   Pos | TokenArrow Pos
-    | TokenReturn  Pos -}
+    | TokenAssign  Pos
 
     -- brackets --
     | TokenCurlyOpen Pos | TokenCurlyClose Pos
@@ -48,9 +47,9 @@ data Token
     | TokenEQ Pos | TokenNE Pos | TokenAt Pos
 
     -- control statements --
-    | TokenIf     Pos {-| TokenThen  Pos-} | TokenElse Pos
-    | TokenFor    Pos   | TokenMin   Pos   | TokenMax  Pos
-    | TokenRepeat Pos   | TokenWhile Pos   | TokenDo   Pos
+    | TokenIf    Pos | TokenElse Pos | TokenFor    Pos
+    | TokenMin   Pos | TokenMax  Pos | TokenRepeat Pos
+    | TokenWhile Pos | TokenDo   Pos
 
     -- IO functions --
     | TokenScan Pos | TokenPrint Pos | TokenPrintln Pos
@@ -72,9 +71,6 @@ token_posn t = case t of
     (TokenUsing p) -> p
     (TokenIn p) -> p
     (TokenAssign p) -> p
-    -- (TokenDef p) -> p
-    -- (TokenArrow p) -> p
-    -- (TokenReturn p) -> p
 
     -- brackets --
     (TokenCurlyOpen p) -> p
@@ -134,7 +130,6 @@ token_posn t = case t of
 
     -- control statements --
     (TokenIf p) -> p
-    -- (TokenThen p) -> p
     (TokenElse p) -> p
     (TokenFor p) -> p
     (TokenMin p) -> p

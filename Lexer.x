@@ -25,15 +25,12 @@ tokens :-
     using       { tok TokenUsing }
     in          { tok TokenIn }
     =           { tok TokenAssign }
-    -- def         { tok TokenDef }
-    -- \-\>        { tok TokenArrow }          -- ->
-    -- return      { tok TokenReturn }
 
     -- brackets --
-    [\{]        { tok TokenCurlyOpen }      -- {
-    [\}]        { tok TokenCurlyClose }     -- }
-    [\(]        { tok TokenParenOpen }      -- (
-    [\)]        { tok TokenParenClose }     -- )
+    "{"         { tok TokenCurlyOpen }
+    "}"         { tok TokenCurlyClose }
+    "("         { tok TokenParenOpen }
+    ")"         { tok TokenParenClose }
 
     -- types --
     int         { tok TokenIntT }
@@ -45,31 +42,31 @@ tokens :-
     false       { tok TokenFalse }
 
     -- separators --
-    [\,]        { tok TokenComma }          -- ,
-    [\;]        { tok TokenSemicolon }      -- ;
+    ","         { tok TokenComma }
+    ";"         { tok TokenSemicolon }
 
     -- operators --
     -- -- int --
-    \+          { tok TokenPlus }           -- +
-    \-          { tok TokenMinus }          -- -
-    \*          { tok TokenTimes }          -- *
-    \/          { tok TokenDiv }            -- /
-    \%          { tok TokenMod }            -- %
+    "+"         { tok TokenPlus }
+    "-"         { tok TokenMinus }
+    "*"         { tok TokenTimes }
+    "/"         { tok TokenDiv }
+    "%"         { tok TokenMod }
 
     -- -- set  --
-    \+\+        { tok TokenSetUnion }       -- ++
-    \\          { tok TokenSetMinus }       -- \
-    \>\<        { tok TokenSetInter }       -- ><
-    \>\?        { tok TokenSetMax }         -- >?
-    \<\?        { tok TokenSetMin }         -- <?
-    \$\?        { tok TokenSetSize }        -- $?
+    "++"        { tok TokenSetUnion }
+    "\\"        { tok TokenSetMinus }
+    "><"        { tok TokenSetInter }
+    ">?"        { tok TokenSetMax }
+    "<?"        { tok TokenSetMin }
+    "$?"        { tok TokenSetSize }
 
     -- -- map --
-    \<\+\>      { tok TokenMapPlus }        -- <+>
-    \<\-\>      { tok TokenMapMinus }       -- <->
-    \<\*\>      { tok TokenMapTimes }       -- <*>
-    \<\/\>      { tok TokenMapDiv }         -- </>
-    \<\%\>      { tok TokenMapMod }         -- <%>
+    "<+>"       { tok TokenMapPlus }
+    "<->"       { tok TokenMapMinus }
+    "<*>"       { tok TokenMapTimes }
+    "</>"       { tok TokenMapDiv }
+    "<%>"       { tok TokenMapMod }
 
     -- -- bool --
     and         { tok TokenAnd }
@@ -77,17 +74,16 @@ tokens :-
     not         { tok TokenNot }
 
     -- -- relational --
-    \<          { tok TokenLT }             -- <
-    \<=         { tok TokenLE }             -- <=
-    \>          { tok TokenGT }             -- >
-    \>=         { tok TokenGE }             -- >=
-    ==          { tok TokenEQ }             -- ==
-    \/=         { tok TokenNE }             -- /=
+    "<"         { tok TokenLT }
+    "<="        { tok TokenLE }
+    ">"         { tok TokenGT }
+    ">="        { tok TokenGE }
+    "=="        { tok TokenEQ }
+    "/="        { tok TokenNE }
     @           { tok TokenAt }
 
     -- control statements --
     if          { tok TokenIf }
-    -- then        { tok TokenThen }
     else        { tok TokenElse }
     for         { tok TokenFor }
     min         { tok TokenMin }
@@ -103,7 +99,8 @@ tokens :-
 
     -- variables --
     $digit+                   { toq TokenInt id }
-    \"([^\"]|(\"))*\"         { toq TokenString read }
+    \"([^\"]|(\\\"))*\"       { toq TokenString read }
+
     $alpha[$alpha$digit\_\']* { toq TokenIdent id }
 
     -- error --
