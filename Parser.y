@@ -19,9 +19,6 @@ import Text.Show.Pretty
     using       { TokenUsing _ }
     in          { TokenIn _ }
     '='         { TokenAssign _ }
-    -- def         { TokenDef _ }
-    -- '->'        { TokenArrow _ }
-    -- return      { TokenReturn _ }
 
     -- brackets --
     '{'         { TokenCurlyOpen _ }
@@ -81,7 +78,6 @@ import Text.Show.Pretty
 
     -- control statements --
     if          { TokenIf _ }
-    -- then        { TokenThen _ }
     else        { TokenElse _ }
     for         { TokenFor _ }
     min         { TokenMin _ }
@@ -136,17 +132,21 @@ Exp : Exp '+'   Exp                     { Plus $1 $3 }
     | Exp '*'   Exp                     { Times $1 $3 }
     | Exp '/'   Exp                     { Div $1 $3 }
     | Exp '%'   Exp                     { Mod $1 $3 }
+
     | Exp '++'  Exp                     { SetUnion $1 $3 }
     | Exp '\\'  Exp                     { SetMinus $1 $3 }
     | Exp '><'  Exp                     { SetInter $1 $3 }
+
     |     '>?'  Exp                     { SetMax  $2 }
     |     '<?'  Exp                     { SetMin  $2 }
     |     '$?'  Exp                     { SetSize $2 }
+
     | Exp '<+>' Exp                     { MapPlus $1 $3 }
     | Exp '<->' Exp                     { MapMinus $1 $3 }
     | Exp '<*>' Exp                     { MapTimes $1 $3 }
     | Exp '</>' Exp                     { MapDiv $1 $3 }
     | Exp '<%>' Exp                     { MapMod $1 $3 }
+
     | Exp '<'   Exp                     { CompLT $1 $3 }
     | Exp '<='  Exp                     { CompLE $1 $3 }
     | Exp '>'   Exp                     { CompGT $1 $3 }
@@ -154,45 +154,50 @@ Exp : Exp '+'   Exp                     { Plus $1 $3 }
     | Exp '=='  Exp                     { CompEQ $1 $3 }
     | Exp '/='  Exp                     { CompNE $1 $3 }
     | Exp '@'   Exp                     { CompAt $1 $3 }
+
     | Exp and   Exp                     { And $1 $3 }
     | Exp or    Exp                     { Or $1 $3 }
     |     not   Exp                     { Not $2 }
+
     |     '-'   Exp %prec NEG           { Negative $2 }
-    | '(' Exp ')'                       { Parens $2 }
+
+    | '(' Exp ')'                       { $2 }
     | num                               { Number $1 }
     | true                              { BoolTrue }
     | false                             { BoolFalse }
     | id                                { Var $1 }
     | '{' Conts '}'                     { Set $2 }
+    | str                               { Strng $1 }
 
-Conts : Conts ',' Exp                   { $1 ++ [$3] }
+Conts : Exp ',' Conts                   { $1 : $3 }
       | Exp                             { [$1] }
       |                                 { [] }
 
-Insts : Insts Inst ';'                  { $1 ++ [$2] }
+Insts : Inst ';' Insts                  { $1 : $3 }
       |                                 { [] }
 
 Inst : id '=' Exp                       { Assign  $1 $3 }
-     | '{' using Declares in Insts '}'  { BlockUsing $3 $5 }
-     | '{' Insts '}'                    { Block $2 }
+
+     | '{' using Declares in Insts '}'  { Block (Just $3) $5 }
+     | '{' Insts '}'                    { Block Nothing   $2 }
+
      | scan id                          { Scan    $2 }
-     | print Printables                 { Print   $2 }
-     | println Printables               { Print  ($2 ++ [Strng newline]) }
-     | if Exp Inst else Inst            { IfElse  $2 $3 $5 }
-     | if Exp Inst                      { If      $2 $3 }
+     | print Conts                      { Print   $2 }
+     | println Conts                    { Print  ($2 ++ [Strng newline]) }
+
+     | if Exp Inst else Inst            { If  $2 $3 (Just $5) }
+     | if Exp Inst                      { If  $2 $3 Nothing }
+
      | repeat Inst while Exp do Inst    { RWD     $2 $4 $6 }
      | while Exp do Inst                { WhileDo $2 $4 }
      | repeat Inst while Exp            { Repeat  $2 $4 }
-     | for id min Exp do Inst           { ForMin $2 $4 $6 }
-     | for id max Exp do Inst           { ForMax $2 $4 $6 }
 
-Printables : Printables ',' Printable   { $1 ++ [$3] }
-           | Printable                  { [$1] }
+     | for id Dir Exp do Inst           { For $2 $3 $4 $6 }
 
-Printable : Exp                         { Exp    $1 }
-          | str                         { Strng  $1 }
+Dir : min { Min }
+    | max { Max }
 
-Declares : Declares Declare ';'         { $1 ++ [$2] }
+Declares : Declare ';' Declares         { $1 : $3 }
          | Declare ';'                  { [$1] }
 
 Declare : Type Variables                { Declare $1 $2 }
@@ -201,7 +206,7 @@ Type : bool                             { BoolType }
      | int                              { IntType }
      | set                              { SetType }
 
-Variables : Variables ',' id            { $1 ++ [$3] }
+Variables : id ',' Variables            { $1 : $3 }
           | id                          { [$1] }
 
 {

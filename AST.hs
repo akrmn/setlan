@@ -31,36 +31,41 @@ data Exp = Plus      Exp    Exp
          | Or        Exp    Exp
          | Not       Exp
          | Negative  Exp
-         | Parens    Exp
          | Number    Token
          | Var       Token
          | Set       [Exp]
          | BoolTrue
          | BoolFalse
+         | Strng Token
          deriving (Eq, Show)
 
-data Inst = Assign       Token  Exp
-          | BlockUsing   [Declare]  [Inst]
-          | Block        [Inst]
-          | Scan         Token
-          | Print        [Printable]
-          | IfElse       Exp    Inst    Inst
-          | If           Exp    Inst
-          | RWD          Inst   Exp     Inst
-          | WhileDo      Exp    Inst
-          | Repeat       Inst   Exp
-          | ForMin       Token  Exp     Inst
-          | ForMax       Token  Exp     Inst
+data Inst = Assign  Token  Exp
+          | Block   {
+                      using :: Maybe [Declare],
+                      instructions :: [Inst]
+                    }
+          | Scan    Token
+          | Print   [Exp]
+          | If      {
+                      condition :: Exp,
+                      then_ :: Inst,
+                      else_ :: Maybe Inst
+                    }
+          | RWD     Inst   Exp     Inst
+          | WhileDo Exp    Inst
+          | Repeat  Inst   Exp
+          | For     {
+                      variable :: Token,
+                      direction :: Direction,
+                      set :: Exp,
+                      instruction :: Inst
+                    }
           deriving (Eq, Show)
 
-data Printable = Strng Token
-               | Exp    Exp
-               deriving (Eq, Show)
+data Direction = Min | Max deriving (Eq, Show)
 
 data Using  = Using [Declare] deriving (Eq, Show)
 
 data Declare = Declare Type [Token] deriving (Eq, Show)
 
 data Type = BoolType | IntType | SetType deriving (Eq, Show)
-
-
