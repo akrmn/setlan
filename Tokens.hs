@@ -1,8 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
-
 module Tokens where
-
-import Data.DeriveTH
 
 data Pos = Pos Int Int deriving Eq
 instance Show Pos where
@@ -62,7 +58,6 @@ data Token
     -- error --
     | TokenError  String Pos
     deriving (Eq, Show)
-$( derive makeIs ''Token)
 
 token_posn :: Token -> Pos
 token_posn t = case t of
@@ -150,3 +145,7 @@ token_posn t = case t of
 
     -- error --
     (TokenError _ p) -> p
+
+isTokenError :: Token -> Bool
+isTokenError (TokenError _ _) = True
+isTokenError _                = False
