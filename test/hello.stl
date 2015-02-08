@@ -1,0 +1,10 @@
+program
+    println "Hello world."
+
+#PROGRAM
+#    PRINT
+#        elements
+#            string
+#                "Hello world."
+#            string
+#                "\n"

@@ -1,0 +1,137 @@
+program {
+    using
+        set x, y;
+        int a, b;
+    in
+
+    scan a;
+    scan b;
+
+    x = {a, b, a + b, a - b, a * b, a / b, a % b};
+    y = {a, b, b + a, b - a, b * a, b / a, b % a};
+
+    # esto se asocia: (a <+> y) ++ (b <+> x) ++ y ++ x
+    for i max a <+> y ++ b <+> x ++ y ++ x do
+        print i, ", "
+    ;
+
+    print "done.";
+}
+
+#PROGRAM
+#    BLOCK
+#        USING
+#            set x
+#            set y
+#            int a
+#            int b
+#        IN
+#        SCAN
+#            variable
+#                a
+#        SCAN
+#            variable
+#                b
+#        ASSIGN
+#            variable
+#                x
+#            value
+#                set
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                    PLUS +
+#                        variable
+#                            a
+#                        variable
+#                            b
+#                    MINUS -
+#                        variable
+#                            a
+#                        variable
+#                            b
+#                    TIMES *
+#                        variable
+#                            a
+#                        variable
+#                            b
+#                    DIVIDE /
+#                        variable
+#                            a
+#                        variable
+#                            b
+#                    MODULO %
+#                        variable
+#                            a
+#                        variable
+#                            b
+#        ASSIGN
+#            variable
+#                y
+#            value
+#                set
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                    PLUS +
+#                        variable
+#                            b
+#                        variable
+#                            a
+#                    MINUS -
+#                        variable
+#                            b
+#                        variable
+#                            a
+#                    TIMES *
+#                        variable
+#                            b
+#                        variable
+#                            a
+#                    DIVIDE /
+#                        variable
+#                            b
+#                        variable
+#                            a
+#                    MODULO %
+#                        variable
+#                            b
+#                        variable
+#                            a
+#        FOR
+#            variable
+#                i
+#            direction
+#                max
+#            IN
+#            UNION ++
+#                UNION ++
+#                    UNION ++
+#                        SETPLUS <+>
+#                            variable
+#                                a
+#                            variable
+#                                y
+#                        SETPLUS <+>
+#                            variable
+#                                b
+#                            variable
+#                                x
+#                    variable
+#                        y
+#                variable
+#                    x
+#            DO
+#                PRINT
+#                    elements
+#                        variable
+#                            i
+#                        string
+#                            ", "
+#        PRINT
+#            elements
+#                string
+#                    "done."
+#    BLOCK_END

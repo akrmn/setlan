@@ -1,0 +1,152 @@
+program {
+    using
+        int n;
+    in
+
+    print "input: ";
+    scan n;
+
+    if (n < 0)
+        println "no negative fibonaccis"
+    else if (n == 0)
+        println "fib(0) = 1"
+    else {
+        using
+            int low, high, count, tmp;
+        in
+
+        count = 0;
+        low = 0;
+        high = 1;
+        while (count <= n) do {
+            tmp = low + high;
+            low = high;
+            high = tmp;
+            println "fib(", count, ") = ", low;
+            count = count + 1;
+        };
+    }
+    ; # del `if` exterior
+}
+
+#PROGRAM
+#    BLOCK
+#        USING
+#            int n
+#        IN
+#        PRINT
+#            elements
+#                string
+#                    "input: "
+#        SCAN
+#            variable
+#                n
+#        IF
+#            condition
+#                LESS <
+#                    variable
+#                        n
+#                    int
+#                        0
+#            THEN
+#                PRINT
+#                    elements
+#                        string
+#                            "no negative fibonaccis"
+#                        string
+#                            "\n"
+#            ELSE
+#                IF
+#                    condition
+#                        EQUAL ==
+#                            variable
+#                                n
+#                            int
+#                                0
+#                    THEN
+#                        PRINT
+#                            elements
+#                                string
+#                                    "fib(0) = 1"
+#                                string
+#                                    "\n"
+#                    ELSE
+#                        BLOCK
+#                            USING
+#                                int low
+#                                int high
+#                                int count
+#                                int tmp
+#                            IN
+#                            ASSIGN
+#                                variable
+#                                    count
+#                                value
+#                                    int
+#                                        0
+#                            ASSIGN
+#                                variable
+#                                    low
+#                                value
+#                                    int
+#                                        0
+#                            ASSIGN
+#                                variable
+#                                    high
+#                                value
+#                                    int
+#                                        1
+#                            WHILE
+#                                condition
+#                                    LESSEQ <=
+#                                        variable
+#                                            count
+#                                        variable
+#                                            n
+#                            DO
+#                                BLOCK
+#                                    ASSIGN
+#                                        variable
+#                                            tmp
+#                                        value
+#                                            PLUS +
+#                                                variable
+#                                                    low
+#                                                variable
+#                                                    high
+#                                    ASSIGN
+#                                        variable
+#                                            low
+#                                        value
+#                                            variable
+#                                                high
+#                                    ASSIGN
+#                                        variable
+#                                            high
+#                                        value
+#                                            variable
+#                                                tmp
+#                                    PRINT
+#                                        elements
+#                                            string
+#                                                "fib("
+#                                            variable
+#                                                count
+#                                            string
+#                                                ") = "
+#                                            variable
+#                                                low
+#                                            string
+#                                                "\n"
+#                                    ASSIGN
+#                                        variable
+#                                            count
+#                                        value
+#                                            PLUS +
+#                                                variable
+#                                                    count
+#                                                int
+#                                                    1
+#                                BLOCK_END
+#                        BLOCK_END
+#    BLOCK_END

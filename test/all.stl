@@ -1,0 +1,428 @@
+program {
+  using
+    int  a, b; # inicializan en 0
+    set  c, d; # inicializan en false
+    bool e, f; # inicializan en {}
+  in
+
+  a = 10;
+  scan b;
+  c = {1,2,3};
+  d = {2,3,4};
+  e = true;
+  scan f;
+
+  print "first: ", b, ", ";
+  println "second: ", f;
+
+  if (b @ c)
+    for i min d ++ c do
+      c = c + i * 2
+  else if (b @ c) {
+    println "improbable";
+  };
+
+  repeat
+    f = e or a + b @ c ++ d
+  while (not f) do
+    e = a < b or f
+  ;
+
+  a = 0;
+  if (b < 0)
+    b = -b
+  ;
+
+  println a + b, ", ", a - b, ", ", a * b, ", ", a / b, ", ", a % b, ", ", -a;
+  println c ++ d, ", ", c >< d, ", ", c \ d, ", ", >? c, ", ", <? c, ", ", $? c;
+  println a <+> c, ", ", c <-> a, ", ", a <*> c, ", ", c </> a, ", ", c <%> a, ", ", a @ c;
+  println e or f, ", ", e and f, ", ", not e;
+  println a < b, a <= b, a > b, a >= b;
+  println a == b, a /= b;
+  println c == d, c /= d;
+  print e == f, e /= f;
+}
+
+#PROGRAM
+#    BLOCK
+#        USING
+#            int a
+#            int b
+#            set c
+#            set d
+#            bool e
+#            bool f
+#        IN
+#        ASSIGN
+#            variable
+#                a
+#            value
+#                int
+#                    10
+#        SCAN
+#            variable
+#                b
+#        ASSIGN
+#            variable
+#                c
+#            value
+#                set
+#                    int
+#                        1
+#                    int
+#                        2
+#                    int
+#                        3
+#        ASSIGN
+#            variable
+#                d
+#            value
+#                set
+#                    int
+#                        2
+#                    int
+#                        3
+#                    int
+#                        4
+#        ASSIGN
+#            variable
+#                e
+#            value
+#                bool
+#                    true
+#        SCAN
+#            variable
+#                f
+#        PRINT
+#            elements
+#                string
+#                    "first: "
+#                variable
+#                    b
+#                string
+#                    ", "
+#        PRINT
+#            elements
+#                string
+#                    "second: "
+#                variable
+#                    f
+#                string
+#                    "\n"
+#        IF
+#            condition
+#                CONTAINS @
+#                    variable
+#                        b
+#                    variable
+#                        c
+#            THEN
+#                FOR
+#                    variable
+#                        i
+#                    direction
+#                        min
+#                    IN
+#                    UNION ++
+#                        variable
+#                            d
+#                        variable
+#                            c
+#                    DO
+#                        ASSIGN
+#                            variable
+#                                c
+#                            value
+#                                PLUS +
+#                                    variable
+#                                        c
+#                                    TIMES *
+#                                        variable
+#                                            i
+#                                        int
+#                                            2
+#            ELSE
+#                IF
+#                    condition
+#                        CONTAINS @
+#                            variable
+#                                b
+#                            variable
+#                                c
+#                    THEN
+#                        BLOCK
+#                            PRINT
+#                                elements
+#                                    string
+#                                        "improbable"
+#                                    string
+#                                        "\n"
+#                        BLOCK_END
+#        REPEAT
+#            ASSIGN
+#                variable
+#                    f
+#                value
+#                    OR or
+#                        variable
+#                            e
+#                        CONTAINS @
+#                            PLUS +
+#                                variable
+#                                    a
+#                                variable
+#                                    b
+#                            UNION ++
+#                                variable
+#                                    c
+#                                variable
+#                                    d
+#        WHILE
+#            condition
+#                NOT not
+#                    variable
+#                        f
+#        DO
+#            ASSIGN
+#                variable
+#                    e
+#                value
+#                    OR or
+#                        LESS <
+#                            variable
+#                                a
+#                            variable
+#                                b
+#                        variable
+#                            f
+#        ASSIGN
+#            variable
+#                a
+#            value
+#                int
+#                    0
+#        IF
+#            condition
+#                LESS <
+#                    variable
+#                        b
+#                    int
+#                        0
+#            THEN
+#                ASSIGN
+#                    variable
+#                        b
+#                    value
+#                        NEGATE -
+#                            variable
+#                                b
+#        PRINT
+#            elements
+#                PLUS +
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                string
+#                    ", "
+#                MINUS -
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                string
+#                    ", "
+#                TIMES *
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                string
+#                    ", "
+#                DIVIDE /
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                string
+#                    ", "
+#                MODULO %
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                string
+#                    ", "
+#                NEGATE -
+#                    variable
+#                        a
+#                string
+#                    "\n"
+#        PRINT
+#            elements
+#                UNION ++
+#                    variable
+#                        c
+#                    variable
+#                        d
+#                string
+#                    ", "
+#                INTERSECTION ><
+#                    variable
+#                        c
+#                    variable
+#                        d
+#                string
+#                    ", "
+#                DIFFERENCE \
+#                    variable
+#                        c
+#                    variable
+#                        d
+#                string
+#                    ", "
+#                MAX >?
+#                    variable
+#                        c
+#                string
+#                    ", "
+#                MIN <?
+#                    variable
+#                        c
+#                string
+#                    ", "
+#                SIZE $?
+#                    variable
+#                        c
+#                string
+#                    "\n"
+#        PRINT
+#            elements
+#                SETPLUS <+>
+#                    variable
+#                        a
+#                    variable
+#                        c
+#                string
+#                    ", "
+#                SETMINUS <->
+#                    variable
+#                        c
+#                    variable
+#                        a
+#                string
+#                    ", "
+#                SETTIMES <*>
+#                    variable
+#                        a
+#                    variable
+#                        c
+#                string
+#                    ", "
+#                SETDIVIDE </>
+#                    variable
+#                        c
+#                    variable
+#                        a
+#                string
+#                    ", "
+#                SETMODULO <%>
+#                    variable
+#                        c
+#                    variable
+#                        a
+#                string
+#                    ", "
+#                CONTAINS @
+#                    variable
+#                        a
+#                    variable
+#                        c
+#                string
+#                    "\n"
+#        PRINT
+#            elements
+#                OR or
+#                    variable
+#                        e
+#                    variable
+#                        f
+#                string
+#                    ", "
+#                AND and
+#                    variable
+#                        e
+#                    variable
+#                        f
+#                string
+#                    ", "
+#                NOT not
+#                    variable
+#                        e
+#                string
+#                    "\n"
+#        PRINT
+#            elements
+#                LESS <
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                LESSEQ <=
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                GREATER >
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                GREATEREQ >=
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                string
+#                    "\n"
+#        PRINT
+#            elements
+#                EQUAL ==
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                UNEQUAL /=
+#                    variable
+#                        a
+#                    variable
+#                        b
+#                string
+#                    "\n"
+#        PRINT
+#            elements
+#                EQUAL ==
+#                    variable
+#                        c
+#                    variable
+#                        d
+#                UNEQUAL /=
+#                    variable
+#                        c
+#                    variable
+#                        d
+#                string
+#                    "\n"
+#        PRINT
+#            elements
+#                EQUAL ==
+#                    variable
+#                        e
+#                    variable
+#                        f
+#                UNEQUAL /=
+#                    variable
+#                        e
+#                    variable
+#                        f
+#    BLOCK_END
