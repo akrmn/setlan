@@ -139,9 +139,9 @@ Exp : Exp '+'   Exp                     { Plus $1 $3 }
     | Exp '++'  Exp                     { SetUnion $1 $3 }
     | Exp '\\'  Exp                     { SetMinus $1 $3 }
     | Exp '><'  Exp                     { SetInter $1 $3 }
-    | Exp '>?'  Exp                     { SetMax  $1 $3 }
-    | Exp '<?'  Exp                     { SetMin  $1 $3 }
-    | Exp '$?'  Exp                     { SetSize $1 $3 }
+    |     '>?'  Exp                     { SetMax  $2 }
+    |     '<?'  Exp                     { SetMin  $2 }
+    |     '$?'  Exp                     { SetSize $2 }
     | Exp '<+>' Exp                     { MapPlus $1 $3 }
     | Exp '<->' Exp                     { MapMinus $1 $3 }
     | Exp '<*>' Exp                     { MapTimes $1 $3 }
@@ -156,7 +156,8 @@ Exp : Exp '+'   Exp                     { Plus $1 $3 }
     | Exp '@'   Exp                     { CompAt $1 $3 }
     | Exp and   Exp                     { And $1 $3 }
     | Exp or    Exp                     { Or $1 $3 }
-    | not Exp                           { Not $2 }
+    |     not   Exp                     { Not $2 }
+    |     '-'   Exp %prec NEG           { Negative $2 }
     | '(' Exp ')'                       { Parens $2 }
     | num                               { Number $1 }
     | true                              { BoolTrue }

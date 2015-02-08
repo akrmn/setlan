@@ -12,9 +12,9 @@ data Exp = Plus      Exp    Exp
          | SetUnion  Exp    Exp
          | SetMinus  Exp    Exp
          | SetInter  Exp    Exp
-         | SetMax    Exp    Exp
-         | SetMin    Exp    Exp
-         | SetSize   Exp    Exp
+         | SetMax    Exp
+         | SetMin    Exp
+         | SetSize   Exp
          | MapPlus   Exp    Exp
          | MapMinus  Exp    Exp
          | MapTimes  Exp    Exp
@@ -30,6 +30,7 @@ data Exp = Plus      Exp    Exp
          | And       Exp    Exp
          | Or        Exp    Exp
          | Not       Exp
+         | Negative  Exp
          | Parens    Exp
          | Number    Token
          | Var       Token

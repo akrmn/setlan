@@ -55,7 +55,7 @@ tokens :-
 
     -- -- set  --
     "++"        { tok TokenSetUnion }
-    "\\"        { tok TokenSetMinus }
+    \\          { tok TokenSetMinus }
     "><"        { tok TokenSetInter }
     ">?"        { tok TokenSetMax }
     "<?"        { tok TokenSetMin }
@@ -108,7 +108,10 @@ tokens :-
 
 {
 
-tok f p s   = f (toPos p)
+tok :: (Pos -> Token) -> AlexPosn -> String -> Token
+tok f p _   = f (toPos p)
+
+toq :: (a -> Pos -> Token) -> (String -> a) -> AlexPosn -> String -> Token
 toq f g p s = f (g s) (toPos p)
 
 toPos :: AlexPosn -> Pos
