@@ -81,7 +81,7 @@ import Text.Show.Pretty
 
     -- control statements --
     if          { TokenIf _ }
-    then        { TokenThen _ }
+    -- then        { TokenThen _ }
     else        { TokenElse _ }
     for         { TokenFor _ }
     min         { TokenMin _ }

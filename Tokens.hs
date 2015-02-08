@@ -48,9 +48,9 @@ data Token
     | TokenEQ Pos | TokenNE Pos | TokenAt Pos
 
     -- control statements --
-    | TokenIf     Pos | TokenThen  Pos | TokenElse Pos
-    | TokenFor    Pos | TokenMin   Pos | TokenMax  Pos
-    | TokenRepeat Pos | TokenWhile Pos | TokenDo   Pos
+    | TokenIf     Pos {-| TokenThen  Pos-} | TokenElse Pos
+    | TokenFor    Pos   | TokenMin   Pos   | TokenMax  Pos
+    | TokenRepeat Pos   | TokenWhile Pos   | TokenDo   Pos
 
     -- IO functions --
     | TokenScan Pos | TokenPrint Pos | TokenPrintln Pos
@@ -134,7 +134,7 @@ token_posn t = case t of
 
     -- control statements --
     (TokenIf p) -> p
-    (TokenThen p) -> p
+    -- (TokenThen p) -> p
     (TokenElse p) -> p
     (TokenFor p) -> p
     (TokenMin p) -> p

@@ -87,7 +87,7 @@ tokens :-
 
     -- control statements --
     if          { tok TokenIf }
-    then        { tok TokenThen }
+    -- then        { tok TokenThen }
     else        { tok TokenElse }
     for         { tok TokenFor }
     min         { tok TokenMin }
