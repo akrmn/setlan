@@ -127,89 +127,103 @@ import Text.Show.Pretty
 
 Program : program Inst                  { Program $2 }
 
-Exp : Exp '+'   Exp                     { Plus $1 $3 }
-    | Exp '-'   Exp                     { Minus $1 $3 }
-    | Exp '*'   Exp                     { Times $1 $3 }
-    | Exp '/'   Exp                     { Div $1 $3 }
-    | Exp '%'   Exp                     { Mod $1 $3 }
+Exp : IntExp {$1} | SetExp {$1} | BoolExp {$1}
 
-    | Exp '++'  Exp                     { SetUnion $1 $3 }
-    | Exp '\\'  Exp                     { SetMinus $1 $3 }
-    | Exp '><'  Exp                     { SetInter $1 $3 }
+Exps : Exp ',' Exps                     { $1 : $3 }
+     | Exp                              { [$1] }
+     |                                  { [] }
 
-    |     '>?'  Exp                     { SetMax  $2 }
-    |     '<?'  Exp                     { SetMin  $2 }
-    |     '$?'  Exp                     { SetSize $2 }
+StrAtom : str                           { Strng (extract $1) }
 
-    | Exp '<+>' Exp                     { MapPlus $1 $3 }
-    | Exp '<->' Exp                     { MapMinus $1 $3 }
-    | Exp '<*>' Exp                     { MapTimes $1 $3 }
-    | Exp '</>' Exp                     { MapDiv $1 $3 }
-    | Exp '<%>' Exp                     { MapMod $1 $3 }
+IntExp  : IntExp BinIntOp IntExp        { BinIntOp   $2 $1 $3 }
+        | '-' IntExp %prec NEG          { Negative   $2 }
+        | UnSetIntOp SetExp             { UnSetIntOp $1 $2 }
+        | '(' IntExp ')'                { $2 }
+        | IntAtom                       { $1 }
 
-    | Exp '<'   Exp                     { CompLT $1 $3 }
-    | Exp '<='  Exp                     { CompLE $1 $3 }
-    | Exp '>'   Exp                     { CompGT $1 $3 }
-    | Exp '>='  Exp                     { CompGE $1 $3 }
-    | Exp '=='  Exp                     { CompEQ $1 $3 }
-    | Exp '/='  Exp                     { CompNE $1 $3 }
-    | Exp '@'   Exp                     { CompAt $1 $3 }
+IntAtom  : Var                          { IntVar $1 }
+         | num                          { Number (extract $1) }
+BinIntOp : '+' { "+" } | '-' { "-" } | '*' { "*" } | '/' { "/" } | '%' { "%" }
+UnSetIntOp : '>?' {">?"} | '<?' {"<?"} | '$?' {"$?"}
 
-    | Exp and   Exp                     { And $1 $3 }
-    | Exp or    Exp                     { Or $1 $3 }
-    |     not   Exp                     { Not $2 }
+SetExp : SetExp BinSetOp SetExp         { BinSetOp   $2 $1 $3 }
+       | SetExp BinMapOp IntExp         { BinMapOpSI $2 $1 $3 }
+       | IntExp BinMapOp SetExp         { BinMapOpIS $2 $1 $3 }
+       | '(' SetExp ')'                 { $2 }
+       | SetAtom                        { $1 }
 
-    |     '-'   Exp %prec NEG           { Negative $2 }
-
-    | '(' Exp ')'                       { $2 }
-    | num                               { Number $1 }
-    | true                              { BoolTrue }
-    | false                             { BoolFalse }
-    | id                                { Var $1 }
-    | '{' Conts '}'                     { Set $2 }
-    | str                               { Strng $1 }
-
-Conts : Exp ',' Conts                   { $1 : $3 }
-      | Exp                             { [$1] }
+SetAtom  : Var                          { SetVar $1 }
+         | '{' Conts '}'                { Set $2 }
+Conts : IntExp ',' Conts                { $1 : $3 }
+      | IntExp                          { [$1] }
       |                                 { [] }
+BinSetOp : '++' {"++"} | '\\' {"\\"} | '><' {"><"}
+BinMapOp : '<+>' {"<+>"} | '<->' {"<->"} | '<*>' {"<*>"} | '</>' {"</>"}
+         | '<%>' {"<%>"}
 
-Insts : Inst ';' Insts                  { $1 : $3 }
-      |                                 { [] }
+BoolExp : BoolExp BinBoolOp BoolExp      { BinBoolOp $2 $1 $3 }
+        | UnBoolOp BoolExp               { UnBoolOp  $1 $2 }
+        | IntExp IntRel IntExp           { IntRel    $2 $1 $3 }
+        | SetExp EqRel SetExp            { SetRel    $2 $1 $3 }
+        | BoolExp EqRel BoolExp          { BoolRel   $2 $1 $3 }
+        | IntExp IntSetRel SetExp        { IntSetRel $2 $1 $3 }
+        | '(' BoolExp ')'                { $2 }
+        | BoolAtom                       { $1 }
 
-Inst : id '=' Exp                       { Assign  $1 $3 }
+BoolAtom  : Var                          { BoolVar $1 }
+          | Bool                         { Boolean $1 }
+Bool      : true {True} | false {False}
+BinBoolOp : and {"and"} | or  {"or"}
+UnBoolOp  : not {"not"}
+IntRel    : '<'  {"<"} | '<=' {"<="} | '>'  {">"} | '>=' {">="}
+          | EqRel {$1}
+EqRel     : '==' {"=="} | '/=' {"/="}
+IntSetRel : '@' {"@"}
 
-     | '{' using Declares in Insts '}'  { Block (Just $3) $5 }
-     | '{' Insts '}'                    { Block Nothing   $2 }
+Var : id { Var (extract $1) }
 
-     | scan id                          { Scan    $2 }
-     | print Conts                      { Print   $2 }
-     | println Conts                    { Print  ($2 ++ [Strng newline]) }
+Insts : Inst ';' Insts                   { $1 : $3 }
+      |                                  { [] }
 
-     | if Exp Inst else Inst            { If  $2 $3 (Just $5) }
-     | if Exp Inst                      { If  $2 $3 Nothing }
+Inst : id '=' Exp                        { Assign  $1 $3 }
 
-     | repeat Inst while Exp do Inst    { RWD     $2 $4 $6 }
-     | while Exp do Inst                { WhileDo $2 $4 }
-     | repeat Inst while Exp            { Repeat  $2 $4 }
+     | '{' using Declares in Insts '}'   { Block (Just $3) $5 }
+     | '{' Insts '}'                     { Block Nothing   $2 }
 
-     | for id Dir Exp do Inst           { For $2 $3 $4 $6 }
+     | scan id                           { Scan    $2 }
+     | print Exps                        { Print   $2 }
+     | println Exps                      { Print  ($2 ++ [Strng newline]) }
+
+     | if BoolExp Inst else Inst         { If  $2 $3 (Just $5) }
+     | if BoolExp Inst                   { If  $2 $3 Nothing }
+
+     | repeat Inst while BoolExp do Inst { RWD     $2 $4 $6 }
+     | while BoolExp do Inst             { WhileDo $2 $4 }
+     | repeat Inst while BoolExp         { Repeat  $2 $4 }
+
+     | for id Dir SetExp do Inst         { For $2 $3 $4 $6 }
 
 Dir : min { Min }
     | max { Max }
 
-Declares : Declare ';' Declares         { $1 : $3 }
-         | Declare ';'                  { [$1] }
+Declares : Declare ';' Declares          { $1 : $3 }
+         | Declare ';'                   { [$1] }
 
-Declare : Type Variables                { Declare $1 $2 }
+Declare : Type Variables                 { Declare $1 $2 }
 
-Type : bool                             { BoolType }
-     | int                              { IntType }
-     | set                              { SetType }
+Type : bool                              { BoolType }
+     | int                               { IntType }
+     | set                               { SetType }
 
-Variables : id ',' Variables            { $1 : $3 }
-          | id                          { [$1] }
+Variables : id ',' Variables             { $1 : $3 }
+          | id                           { [$1] }
 
 {
+
+extract :: Token -> String
+extract (TokenInt    s _) = s
+extract (TokenIdent  s _) = s
+extract (TokenString s _) = s
 
 newline = TokenString "\n" (Pos 0 0)
 
