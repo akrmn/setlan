@@ -168,8 +168,7 @@ Conts : Conts ',' Exp                   { $1 ++ [$3] }
       | Exp                             { [$1] }
       |                                 { [] }
 
-Insts : Insts ';' Inst                  { $1 ++ [$3] }
-      | Inst ';'                        { [$1] }
+Insts : Insts Inst ';'                  { $1 ++ [$2] }
       |                                 { [] }
 
 Inst : id '=' Exp                       { Assign  $1 $3 }
@@ -192,7 +191,7 @@ Printables : Printables ',' Printable   { $1 ++ [$3] }
 Printable : Exp                         { Exp    $1 }
           | str                         { Strng  $1 }
 
-Declares : Declares ';' Declare         { $1 ++ [$3] }
+Declares : Declares Declare ';'         { $1 ++ [$2] }
          | Declare ';'                  { [$1] }
 
 Declare : Type Variables                { Declare $1 $2 }
