@@ -158,7 +158,7 @@ instance Show'' Inst where
                               (tabs (n+1)) ++ "Then\n" ++ (show'' (n+2) t) ++
                               "Else\n" ++ (show'' (n+2) e)
       (RWD r w d)         -> "Repeat\n" ++ (show'' (n+1) r) ++ "\n" ++ (tabs n) ++
-                              "While\n" ++ (show'' (n+1) w) ++ (tabs n) ++
+                              "While\n" ++ (show'' (n+1) w) ++ "\n" ++ (tabs n) ++
                               "Do\n" ++ (show'' (n+1) d)
       (WhileDo w d)       -> "While\n" ++ (show'' (n+1) w) ++ "\n" ++ (tabs n) ++
                               "Do\n" ++ (show'' (n+1) d)
