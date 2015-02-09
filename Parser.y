@@ -179,7 +179,7 @@ Insts : Inst ';' Insts                  { $1 : $3 }
 
 Inst : id '=' Exp                       { Assign (extract $1) $3 }
 
-     | '{' using Declares in Insts '}'  { Block (Just $3) $5 }
+     | '{' Using Insts '}'              { Block (Just $2) $3 }
      | '{' Insts '}'                    { Block Nothing   $2 }
 
      | scan id                          { Scan    (extract $2) }
@@ -197,6 +197,8 @@ Inst : id '=' Exp                       { Assign (extract $1) $3 }
 
 Dir : min { Min }
     | max { Max }
+
+Using : using Declares in               { Using $2 }
 
 Declares : Declare ';' Declares         {  $1 : $3 }
          | Declare ';'                  { [$1] }
@@ -224,15 +226,11 @@ parseError l = case l of
     [] -> error $ "Unexpected EOF."
     _  -> error $ "Parse error on " ++ show (head l) ++ "."
 
-printAST :: [Token] -> IO()
-printAST = putStrLn . ppShow . parsr
-
 parser :: String -> IO ()
 parser text = do
     let toks = alexScanTokens text
     if any isTokenError toks
         then mapM_ printError $ filter isTokenError toks
-        -- else putStrLn . show' . parsr $ toks
-        else printAST toks
+        else putStrLn . show' . parsr $ toks
 
 }
