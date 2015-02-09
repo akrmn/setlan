@@ -109,7 +109,7 @@ instance Show'' Exp where
       (Mod       a    b) -> "Modulation %\n" ++ (show'' (n+1) a) ++ "\n" ++ (show'' (n+1) b)
       (SetUnion  a    b) -> "Union ++\n" ++ (show'' (n+1) a) ++ "\n" ++ (show'' (n+1) b)
       (SetMinus  a    b) -> "Difference \\\n" ++ (show'' (n+1) a) ++ "\n" ++ (show'' (n+1) b)
-      (SetInter  a    b) -> "Intersection >< +\n" ++ (show'' (n+1) a) ++ "\n" ++ (show'' (n+1) b)
+      (SetInter  a    b) -> "Intersection ><\n" ++ (show'' (n+1) a) ++ "\n" ++ (show'' (n+1) b)
       (SetMax    a)      -> "Max >?\n" ++ (show'' (n+1) a)
       (SetMin    a)      -> "Min <?\n" ++ (show'' (n+1) a)
       (SetSize   a)      -> "Size $?\n" ++ (show'' (n+1) a)
@@ -157,12 +157,12 @@ instance Show'' Inst where
       (If c t (Just e))   -> "If\n" ++ (show'' (n+1) c) ++ "\n" ++
                               (tabs (n+1)) ++ "Then\n" ++ (show'' (n+2) t) ++
                               "Else\n" ++ (show'' (n+2) e)
-      (RWD r w d)         -> "Repeat\n" ++ (show'' (n+1) r) ++ (tabs n) ++
+      (RWD r w d)         -> "Repeat\n" ++ (show'' (n+1) r) ++ "\n" ++ (tabs n) ++
                               "While\n" ++ (show'' (n+1) w) ++ (tabs n) ++
                               "Do\n" ++ (show'' (n+1) d)
-      (WhileDo w d)       -> "While\n" ++ (show'' (n+1) w) ++ (tabs n) ++
+      (WhileDo w d)       -> "While\n" ++ (show'' (n+1) w) ++ "\n" ++ (tabs n) ++
                               "Do\n" ++ (show'' (n+1) d)
-      (Repeat r w)        -> "Repeat\n" ++ (show'' (n+1) r) ++ (tabs n) ++
+      (Repeat r w)        -> "Repeat\n" ++ (show'' (n+1) r) ++ "\n" ++ (tabs n) ++
                               "While\n" ++ (show'' (n+1) w)
       (For v d s i)       -> "For\n" ++ (tabs (n+1)) ++ "variable\n" ++
                               (tabs (n+2)) ++ v ++ "\n" ++ (tabs (n+1)) ++
