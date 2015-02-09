@@ -223,8 +223,8 @@ newline = TokenString "\n" (Pos 0 0)
 
 parseError :: [Token] -> a
 parseError l = case l of
-    [] -> error $ "Unexpected EOF."
-    _  -> error $ "Parse error on " ++ show (head l) ++ "."
+    [] -> error $ "Unexpected EOF"
+    _  -> error $ "Unexpected " ++ show (head l)
 
 parser :: String -> IO ()
 parser text = do

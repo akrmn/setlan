@@ -143,11 +143,8 @@ instance Show'' Inst where
                               "value\n" ++ (show'' (n+2) e)
       (Block Nothing is)  -> "Block\n" ++
                               (concat $ intersperse "\n" (map (show'' (n+1)) is))
-
       (Block (Just u) is) -> "Block\n" ++ (show'' (n+1) u) ++ "\n" ++
                               (concat $ intersperse "\n" (map (show'' (n+1)) is))
-
-
       (Scan v)            -> "Scan\n" ++ (tabs (n+1)) ++ "variable\n" ++
                               (tabs (n+2)) ++ show v
       (Print es)          -> "Print\n" ++ (tabs (n+1)) ++ "elements\n" ++

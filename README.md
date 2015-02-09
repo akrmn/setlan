@@ -11,7 +11,7 @@ We chose Haskell for its powerful functional notation, and because of the
 ease of use of the tools Alex and Happy.
 
 ### Current Status
-The Lexer is working as expected.
+The Parser and Lexer are working as expected.
 
 ### Problems?
 None yet.

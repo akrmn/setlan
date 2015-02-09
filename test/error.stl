@@ -1,0 +1,15 @@
+program {
+    using
+        int a,b,c;
+        int x,y;
+    in
+
+    x = b*b - 2*a*c;
+    y = ;
+
+    if (x >= 0)
+        println "Raiz real", y
+    else
+        println "Raiz imaginaria", y
+    ;
+}
