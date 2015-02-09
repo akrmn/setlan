@@ -166,8 +166,8 @@ instance Show'' Inst where
                               "While\n" ++ (show'' (n+1) w)
       (For v d s i)       -> "For\n" ++ (tabs (n+1)) ++ "variable\n" ++
                               (tabs (n+2)) ++ v ++ "\n" ++ (tabs (n+1)) ++
-                              "direction" ++ (show'' (n+2) d) ++ "\n" ++
-                              (tabs (n+1)) ++ "in" ++ (show'' (n+2) s) ++
+                              "direction\n" ++ (show'' (n+2) d) ++ "\n" ++
+                              (tabs (n+1)) ++ "in\n" ++ (show'' (n+2) s) ++
                               "\n" ++ (tabs (n+1)) ++ "do\n" ++
                               (show'' (n+2) i)
 
