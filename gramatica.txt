@@ -1,0 +1,84 @@
+Program : program Inst
+
+Inst : id '=' Exp
+
+     | '{' Using Insts '}'
+     | '{' Insts '}'
+
+     | print Conts
+     | println Conts
+
+     | if Exp Inst else Inst
+     | if Exp Inst
+
+     | repeat Inst while Exp do Inst
+     | while Exp do Inst
+     | repeat Inst while Exp
+     | for id Dir Exp do Inst
+     | scan id
+
+Insts : Inst ';' Insts
+      | E
+
+Exp : Exp '+'   Exp
+    | Exp '-'   Exp
+    | Exp '*'   Exp
+    | Exp '/'   Exp
+    | Exp '%'   Exp
+
+    | Exp '++'  Exp
+    | Exp '\\'  Exp
+    | Exp '><'  Exp
+
+    |     '>?'  Exp
+    |     '<?'  Exp
+    |     '$?'  Exp
+
+    | Exp '<+>' Exp
+    | Exp '<->' Exp
+    | Exp '<*>' Exp
+    | Exp '</>' Exp
+    | Exp '<%>' Exp
+
+    | Exp '<'   Exp
+    | Exp '<='  Exp
+    | Exp '>'   Exp
+    | Exp '>='  Exp
+    | Exp '=='  Exp
+    | Exp '/='  Exp
+    | Exp '@'   Exp
+
+    | Exp and   Exp
+    | Exp or    Exp
+    |     not   Exp
+
+    |     '-'   Exp %prec NEG
+
+    | '(' Exp ')'
+    | num
+    | true
+    | false
+    | id
+    | '{' Conts '}'
+    | str
+
+Conts : Exp ',' Conts
+      | Exp
+      | E
+
+Declare : Type Variables
+
+Using : using Declares in
+
+Declares : Declare ';' Declares
+         | Declare ';'
+
+Type : bool
+     | int
+     | set
+
+Variables : id ',' Variables
+          | id
+
+Dir : min
+    | max
