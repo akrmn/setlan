@@ -5,8 +5,6 @@ module Parser (
 import Tokens
 import AST
 import Lexer
-
-import Text.Show.Pretty
 }
 
 %name parsr
@@ -162,7 +160,7 @@ Exp : Exp '+'   Exp                     { Plus $1 $3 }
     |     '-'   Exp %prec NEG           { Negative $2 }
 
     | '(' Exp ')'                       { $2 }
-    | num                               { Number (extract $1) }
+    | num                               { Number (extract' $1) }
     | Bool                              { Boolean $1 }
     | id                                { Var (extract $1) }
     | '{' Conts '}'                     { Set $2 }
@@ -186,12 +184,12 @@ Inst : id '=' Exp                       { Assign (extract $1) $3 }
      | print Conts                      { Print   $2 }
      | println Conts                    { Print  ($2 ++ [Strng "\n"]) }
 
-     | if Exp Inst else Inst            { If  $2 $3 (Just $5) }
-     | if Exp Inst                      { If  $2 $3 Nothing }
+     | if '(' Exp ')' Inst else Inst    { If  $3 $5 (Just $7) }
+     | if '(' Exp ')' Inst              { If  $3 $5 Nothing }
 
-     | repeat Inst while Exp do Inst    { RWD     $2 $4 $6 }
-     | while Exp do Inst                { WhileDo $2 $4 }
-     | repeat Inst while Exp            { Repeat  $2 $4 }
+     | repeat Inst while '(' Exp ')' do Inst    { RWD     $2 $5 $8 }
+     | while '(' Exp ')' do Inst                { WhileDo $3 $6 }
+     | repeat Inst while '(' Exp ')'            { Repeat  $2 $5 }
 
      | for id Dir Exp do Inst           { For (extract $2) $3 $4 $6 }
 
@@ -217,7 +215,9 @@ Variables : id ',' Variables            {  (extract $1) : $3 }
 extract :: Token -> String
 extract (TokenString s _) = s
 extract (TokenIdent s _) = s
-extract (TokenInt s _)   = s
+
+extract' :: Token -> Int
+extract' (TokenInt n _)   = n
 
 newline = TokenString "\n" (Pos 0 0)
 

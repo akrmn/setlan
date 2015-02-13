@@ -51,12 +51,13 @@ data Token
     | TokenScan Pos | TokenPrint Pos | TokenPrintln Pos
 
     -- variables --
-    | TokenInt    String Pos
+    | TokenInt    Int    Pos
     | TokenString String Pos
     | TokenIdent  String Pos
 
-    -- error --
-    | TokenError  String Pos
+    -- errors --
+    | TokenError    String Pos
+    | TokenIntError String Pos
     deriving (Eq, Show)
 
 token_posn :: Token -> Pos
@@ -143,9 +144,11 @@ token_posn t = case t of
     (TokenString _ p) -> p
     (TokenIdent  _ p) -> p
 
-    -- error --
+    -- errors --
     (TokenError _ p) -> p
+    (TokenIntError _ p) -> p
 
 isTokenError :: Token -> Bool
-isTokenError (TokenError _ _) = True
-isTokenError _                = False
+isTokenError (TokenError    _ _) = True
+isTokenError (TokenIntError _ _) = True
+isTokenError _                   = False

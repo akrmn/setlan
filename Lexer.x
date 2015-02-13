@@ -98,7 +98,7 @@ tokens :-
     println     { tok TokenPrintln }
 
     -- variables --
-    $digit+                   { toq TokenInt id }
+    (\-?)$digit+              { lexInt }
     \"([^\"]|(\\\"))*\"       { toq TokenString read }
 
     $alpha[$alpha$digit\_\']* { toq TokenIdent id }
@@ -114,12 +114,21 @@ tok f p _   = f (toPos p)
 toq :: (a -> Pos -> Token) -> (String -> a) -> AlexPosn -> String -> Token
 toq f g p s = f (g s) (toPos p)
 
+lexInt :: AlexPosn -> String -> Token
+lexInt p s
+         | n < -2^31  = TokenIntError s (toPos p)
+         | n < 2^31   = TokenInt      n (toPos p)
+         | otherwise  = TokenIntError s (toPos p)
+         where n = (read s :: (Num a, Read a) => a)
+
 toPos :: AlexPosn -> Pos
 toPos (AlexPn _ line column) = Pos line column
 
 printError :: Token -> IO ()
 printError (TokenError s p) = do
     putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
+printError (TokenIntError s p) = do
+    putStrLn $ "Error: integer out of range (-2^31 .. 2^31-1) \"" ++ s ++ "\" " ++ show p
 
 lexer :: String -> IO ()
 -- Calls the Alex token scanner and then prints found tokens. If there are any
