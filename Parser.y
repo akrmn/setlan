@@ -1,6 +1,7 @@
 {
 module Parser (
-  parser
+  parser,
+  parsr
 ) where
 import Tokens
 import AST

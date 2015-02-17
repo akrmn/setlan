@@ -1,6 +1,7 @@
 module Main (main) where
 
 import Parser (parser)
+import Symbols
 import System.Environment
 import System.IO
 
