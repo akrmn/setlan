@@ -126,17 +126,19 @@ lexInt p s
 
 printError :: Token -> IO ()
 printError (TokenError s p) = do
-    putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
+  putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
 printError (TokenIntError s p) = do
-    putStrLn $ "Error: integer out of range (-2^31 .. 2^31-1) \"" ++ s ++ "\" " ++ show p
+  putStrLn $ "Error: integer out of range (-2^31 .. 2^31-1) \"" ++ s ++ "\" " ++ show p
 
-lexer :: String -> IO ()
+lexer :: String -> String -> IO ()
 -- Calls the Alex token scanner and then prints found tokens. If there are any
 -- TokenErrors, it only prints those.
-lexer text = do
-    let toks = alexScanTokens text
-    if any isTokenError toks
-        then mapM_ printError $ filter isTokenError toks
-        else mapM_ print toks
+lexer text name = do
+  putStrLn $ "Lexer (" ++ name ++ "):\n"
+  let toks = alexScanTokens text
+  if any isTokenError toks
+    then mapM_ printError $ filter isTokenError toks
+    else mapM_ print toks
+  putStrLn ""
 
 }

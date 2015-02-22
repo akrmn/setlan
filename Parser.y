@@ -232,14 +232,16 @@ extract' (TokenInt n _) = n
 
 parseError :: [Token] -> a
 parseError l = case l of
-    [] -> error $ "Unexpected EOF"
-    _  -> error $ "Unexpected " ++ show (head l)
+  [] -> error $ "Unexpected EOF"
+  _  -> error $ "Unexpected " ++ show (head l)
 
-parser :: String -> IO ()
-parser text = do
-    let toks = alexScanTokens text
-    if any isTokenError toks
-        then mapM_ printError $ filter isTokenError toks
-        else putStrLn . show' . parsr $ toks
+parser :: String -> String -> IO ()
+parser text name = do
+  putStrLn $ "Parser (" ++ name ++ "):\n"
+  let toks = alexScanTokens text
+  if any isTokenError toks
+    then mapM_ printError $ filter isTokenError toks
+    else putStrLn . show' . parsr $ toks
+  putStrLn ""
 
 }
