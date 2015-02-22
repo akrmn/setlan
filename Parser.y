@@ -128,38 +128,38 @@ Program
   : program Inst                            {Program $2}
 
 Exp
-  : Exp '+'   Exp                           {Binary Plus  $1 $3}
-  | Exp '-'   Exp                           {Binary Minus $1 $3}
-  | Exp '*'   Exp                           {Binary Times $1 $3}
-  | Exp '/'   Exp                           {Binary Div   $1 $3}
-  | Exp '%'   Exp                           {Binary Mod   $1 $3}
+  : Exp '+'   Exp                           {Binary (Plus  (tp $2)) $1 $3}
+  | Exp '-'   Exp                           {Binary (Minus (tp $2)) $1 $3}
+  | Exp '*'   Exp                           {Binary (Times (tp $2)) $1 $3}
+  | Exp '/'   Exp                           {Binary (Div   (tp $2)) $1 $3}
+  | Exp '%'   Exp                           {Binary (Mod   (tp $2)) $1 $3}
 
-  | Exp '++'  Exp                           {Binary SetUnion $1 $3}
-  | Exp '\\'  Exp                           {Binary SetMinus $1 $3}
-  | Exp '><'  Exp                           {Binary SetInter $1 $3}
+  | Exp '++'  Exp                           {Binary (SetUnion (tp $2)) $1 $3}
+  | Exp '\\'  Exp                           {Binary (SetMinus (tp $2)) $1 $3}
+  | Exp '><'  Exp                           {Binary (SetInter (tp $2)) $1 $3}
 
-  | Exp '<+>' Exp                           {Binary MapPlus  $1 $3}
-  | Exp '<->' Exp                           {Binary MapMinus $1 $3}
-  | Exp '<*>' Exp                           {Binary MapTimes $1 $3}
-  | Exp '</>' Exp                           {Binary MapDiv   $1 $3}
-  | Exp '<%>' Exp                           {Binary MapMod   $1 $3}
+  | Exp '<+>' Exp                           {Binary (MapPlus  (tp $2)) $1 $3}
+  | Exp '<->' Exp                           {Binary (MapMinus (tp $2)) $1 $3}
+  | Exp '<*>' Exp                           {Binary (MapTimes (tp $2)) $1 $3}
+  | Exp '</>' Exp                           {Binary (MapDiv   (tp $2)) $1 $3}
+  | Exp '<%>' Exp                           {Binary (MapMod   (tp $2)) $1 $3}
 
-  | Exp '<'   Exp                           {Binary CompLT $1 $3}
-  | Exp '<='  Exp                           {Binary CompLE $1 $3}
-  | Exp '>'   Exp                           {Binary CompGT $1 $3}
-  | Exp '>='  Exp                           {Binary CompGE $1 $3}
-  | Exp '=='  Exp                           {Binary CompEQ $1 $3}
-  | Exp '/='  Exp                           {Binary CompNE $1 $3}
-  | Exp '@'   Exp                           {Binary CompAt $1 $3}
+  | Exp '<'   Exp                           {Binary (CompLT (tp $2)) $1 $3}
+  | Exp '<='  Exp                           {Binary (CompLE (tp $2)) $1 $3}
+  | Exp '>'   Exp                           {Binary (CompGT (tp $2)) $1 $3}
+  | Exp '>='  Exp                           {Binary (CompGE (tp $2)) $1 $3}
+  | Exp '=='  Exp                           {Binary (CompEQ (tp $2)) $1 $3}
+  | Exp '/='  Exp                           {Binary (CompNE (tp $2)) $1 $3}
+  | Exp '@'   Exp                           {Binary (CompAt (tp $2)) $1 $3}
 
-  | Exp and   Exp                           {Binary And $1 $3}
-  | Exp or    Exp                           {Binary Or  $1 $3}
+  | Exp and   Exp                           {Binary (And (tp $2)) $1 $3}
+  | Exp or    Exp                           {Binary (Or  (tp $2)) $1 $3}
 
-  |     '>?'  Exp                           {Unary  SetMax   $2}
-  |     '<?'  Exp                           {Unary  SetMin   $2}
-  |     '$?'  Exp                           {Unary  SetSize  $2}
-  |     not   Exp                           {Unary  Not      $2}
-  |     '-'   Exp %prec NEG                 {Unary  Negative $2}
+  |     '>?'  Exp                           {Unary  (SetMax   (tp $1)) $2}
+  |     '<?'  Exp                           {Unary  (SetMin   (tp $1)) $2}
+  |     '$?'  Exp                           {Unary  (SetSize  (tp $1)) $2}
+  |     not   Exp                           {Unary  (Not      (tp $1)) $2}
+  |     '-'   Exp %prec NEG                 {Unary  (Negative (tp $1)) $2}
 
   | '(' Exp ')'                             {$2}
   | '{' Conts '}'                           {Set $2}
@@ -182,23 +182,23 @@ Insts
   |                                         {[]}
 
 Inst
-  : id '=' Exp                              {Assign (extract $1) $3}
+  : id '=' Exp                              {Assign (extract $1) $3 (tp $1)}
 
-  | '{' using Declares in Insts '}'         {Block $3 $5}
-  | '{' Insts '}'                           {Block [] $2}
+  | '{' using Declares in Insts '}'         {Block $3 $5 (tp $1)}
+  | '{' Insts '}'                           {Block [] $2 (tp $1)}
 
-  | scan id                                 {Scan    (extract $2)}
-  | print Conts                             {Print   $2}
-  | println Conts                           {Print  ($2 ++ [StrConst "\n"])}
+  | scan id                                 {Scan    (extract $2)           (tp $1)}
+  | print Conts                             {Print   $2                     (tp $1)}
+  | println Conts                           {Print  ($2 ++ [StrConst "\n"]) (tp $1)}
 
-  | if '(' Exp ')' Inst else Inst           {If  $3 $5 (Just $7)}
-  | if '(' Exp ')' Inst                     {If  $3 $5 Nothing}
+  | if '(' Exp ')' Inst else Inst           {If  $3 $5 (Just $7) (tp $1)}
+  | if '(' Exp ')' Inst                     {If  $3 $5 Nothing   (tp $1)}
 
-  | repeat Inst while '(' Exp ')' do Inst   {RWD (Just $2) $5 (Just $8)}
-  | while '(' Exp ')' do Inst               {RWD Nothing   $3 (Just $6)}
-  | repeat Inst while '(' Exp ')'           {RWD (Just $2) $5 Nothing}
+  | repeat Inst while '(' Exp ')' do Inst   {RWD (Just $2) $5 (Just $8) (tp $3)}
+  | while '(' Exp ')' do Inst               {RWD Nothing   $3 (Just $6) (tp $1)}
+  | repeat Inst while '(' Exp ')'           {RWD (Just $2) $5 Nothing   (tp $3)}
 
-  | for id Dir Exp do Inst                  {For (extract $2) $3 $4 $6}
+  | for Var Dir Exp do Inst                  {For $2 $3 $4 $6 (tp $1)}
 
 Dir
   : min                                     {Min}
@@ -208,20 +208,23 @@ Declares
   : Declare ';' Declares                    {$1 : $3}
   | Declare ';'                             {[$1]}
 
-Declare : Type Variables                    {Declare $1 $2}
+Declare : Type Vars                         {Declare $1 $2}
 
 Type
   : bool                                    {BoolType}
   | int                                     {IntType}
   | set                                     {SetType}
 
-Variables
-  : Var ',' Variables                       {$1 : $3}
+Vars
+  : Var ',' Vars                            {$1 : $3}
   | Var                                     {[$1]}
 Var
   : id                                      {extract $1}
 
 {
+
+tp :: Token -> Pos
+tp = token_posn
 
 extract :: Token -> String
 extract (TokenString s _) = s

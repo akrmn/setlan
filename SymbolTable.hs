@@ -1,19 +1,15 @@
-module Symbols where
+module SymbolTable where
+
+import AST (Type(..))
 
 import qualified Data.Set as Set
 import qualified Data.Map as Map
+import Prelude hiding (lookup)
 
-import Parser (parsr)
-import AST
-
---symbols :: string -> IO ()
---symbols text = do
---  let toks = alexScanTokens text
---  if any isTokenError toks
---    then mapM_ printError $ filter isTokenError toks
---    else putStrLn . scoper . parsr $ toks
-
---scoper :: Program -> SymbolTable
+varType :: Variable -> Type
+varType (IntVar  _) = IntType
+varType (BoolVar _) = BoolType
+varType (SetVar  _) = SetType
 
 data Variable
   = IntVar  {getInt  :: Int}
@@ -36,7 +32,7 @@ empty =
   }
 
 insert' :: String -> Variable -> SymbolTable -> SymbolTable
-insert name var st =
+insert' name var st =
   SymbolTable (Map.insert name var (variables st)) (daughters st)
 
 insert :: String -> Variable -> SymbolTable -> SymbolTable
@@ -58,6 +54,14 @@ update name var st =
 elem :: String -> SymbolTable -> Bool
 elem name st =
   name `Map.member` (variables st)
+
+firstJust :: [Maybe a] -> Maybe a
+firstJust []             = Nothing
+firstJust (Just x : xs)  = Just x
+firstJust (Nothing : xs) = firstJust xs
+
+deepLookup :: String -> [SymbolTable] -> Maybe Variable
+deepLookup s sts = firstJust $ map (lookup s) sts
 
 lookup :: String -> SymbolTable -> Maybe Variable
 lookup name st =
