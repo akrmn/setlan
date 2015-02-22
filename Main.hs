@@ -13,17 +13,19 @@ context text name = do
     putStrLn "ajndkjandk"
     putStrLn ""
 
-showHelp = do
-    putStrLn "setlan usage:"
-    putStrLn "    setlan <file0> .. <fileN> <flag0> .. <flagM>"
-    putStrLn "    the flags can be any combination of:"
-    putStrLn "        -l or -t : lexer (tokens)"
-    putStrLn "        -p or -a : parser (abstract syntax tree)"
-    putStrLn "        -c or -s : context tree (symbol table)"
-    putStrLn "        any other: this infomation is shown"
-    putStrLn "    if no flags are given, the default command is run:"
-    putStrLn "        context tree"
-    putStrLn "    if no files are given, the program reads from stdin"
+help :: String
+help = unlines
+    [ "setlan usage:"
+    , "    setlan <file0> .. <fileN> <flag0> .. <flagM>"
+    , "    the flags can be any combination of:"
+    , "        -l or -t : lexer (tokens)"
+    , "        -p or -a : parser (abstract syntax tree)"
+    , "        -c or -s : context tree (symbol table)"
+    , "        any other: this infomation is shown"
+    , "    if no flags are given, the default command is run:"
+    , "        context tree"
+    , "    if no files are given, the program reads from stdin"
+    ]
 
 run :: Flag -> (String -> String -> IO ())
 run DoLex     = lexer
@@ -47,5 +49,5 @@ main = do
         else files
 
     if WrongFlag `elem` flags
-        then showHelp
+        then putStr help
         else sequence_ [run f x y | (x,y) <- zip contents files', f <- flags']

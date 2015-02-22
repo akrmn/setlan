@@ -5,11 +5,10 @@ import System.Environment
 import System.IO
 
 data Flag
-  = DoLex
+  = WrongFlag
+  | DoLex
   | DoParse
   | DoContext
-  | Help
-  | WrongFlag
   deriving (Eq, Show, Ord)
 
 toFlag :: Char -> Flag
@@ -22,7 +21,7 @@ toFlag 'p' = DoParse
 toFlag 's' = DoContext
 toFlag 'c' = DoContext
 
-toFlag  x  = WrongFlag
+toFlag  _  = WrongFlag
 
 toFlags :: String -> [Flag]
 toFlags []     = []
