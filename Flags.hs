@@ -23,13 +23,9 @@ toFlag 'c' = DoContext
 
 toFlag  _  = WrongFlag
 
-toFlags :: String -> [Flag]
-toFlags []     = []
-toFlags (x:xs) = toFlag x : toFlags xs
-
 takeFlags :: [String] -> [Flag]
 takeFlags x = sort (nub flags)
-  where flags = x' >>= toFlags
+  where flags = x' >>= (map toFlag)
         x'    = map tail (filter (\x -> head x == '-') x)
 
 takeFiles :: [String] -> [String]

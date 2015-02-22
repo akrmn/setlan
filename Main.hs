@@ -34,15 +34,15 @@ run DoContext = context
 
 main :: IO ()
 main = do
-    flags <- (liftM takeFlags) getArgs
+    flags <- liftM takeFlags getArgs
     let flags' = if null flags
         then [DoContext]
         else flags
 
-    files <- (liftM takeFiles) getArgs
+    files <- liftM takeFiles getArgs
     contents <- if not (null files)
-        then (mapM readFile) files
-        else (mapM id) [getContents]
+        then mapM readFile files
+        else mapM id [getContents]
 
     let files' = if null files
         then ["stdin"]
