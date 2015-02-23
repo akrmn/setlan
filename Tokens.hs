@@ -4,6 +4,9 @@ data Pos = Pos Int Int deriving Eq
 instance Show Pos where
     show (Pos l c) = "(Line " ++ show l ++ ", Col " ++ show c ++ ")"
 
+error' :: Pos -> String -> a
+error' p m = error $ m ++ " (" ++ show pos ++ ")"
+
 data Token
     -- language --
     = TokenProgram Pos | TokenUsing Pos   | TokenIn    Pos

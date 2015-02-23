@@ -11,10 +11,21 @@ varType (IntVar  _) = IntType
 varType (BoolVar _) = BoolType
 varType (SetVar  _) = SetType
 
+data ScopeType = BlockScope | ForScope deriving (Eq, Show)
+
 data Variable
-  = IntVar  {getInt  :: Int}
-  | BoolVar {getBool :: Bool}
-  | SetVar  {getSet  :: (Set.Set Int)}
+  = IntVar  { getInt  :: Int
+            , scopeType :: ScopeType
+            }
+  | BoolVar { getBool :: Bool
+            , scopeType :: ScopeType
+            }
+  | SetVar  { getSet  :: (Set.Set Int)
+            , scopeType :: ScopeType
+            }
+  | StrVar  { getStr  :: String
+            , scopeType :: ScopeType
+            }
   deriving (Show)
 
 data SymbolTable
