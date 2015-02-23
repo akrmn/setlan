@@ -19,12 +19,17 @@ data Direction = Min | Max deriving (Eq, Show)
 
 data Declare = Declare Type [String] deriving (Eq, Show)
 
-data Type = BoolType | IntType | SetType deriving (Eq)
+data Type
+  = BoolType
+  | IntType
+  | SetType
+  | StrType
+  deriving (Eq)
 
 data Exp
   = Binary     BinOp   Exp  Exp
   | Unary      UnOp    Exp
-  | Set        [Exp]
+  | Set        [Exp]   Pos
   | IntConst   Int
   | BoolConst  Bool
   | StrConst   String
@@ -166,9 +171,10 @@ instance Show'' Declare where
 instance Show Type where
   show x =
     case x of
-      BoolType -> "bool"
-      IntType  -> "int"
-      SetType  -> "set"
+      BoolType  -> "bool"
+      IntType   -> "int"
+      SetType   -> "set"
+      StrType   -> "string"
 
 instance Show'' Exp where
   show'' n x = (tabs n) ++
@@ -205,28 +211,28 @@ instance Show'' Exp where
 instance Show BinOp where
   show x =
     case x of
-      (Plus     _) -> "Plus +"
-      (Minus    _) -> "Minus -"
-      (Times    _) -> "Times *"
-      (Div      _) -> "Div /"
-      (Mod      _) -> "Mod %"
-      (SetUnion _) -> "SetUnion ++"
-      (SetMinus _) -> "SetMinus \\"
-      (SetInter _) -> "SetInter ><"
-      (MapPlus  _) -> "MapPlus <+>"
-      (MapMinus _) -> "MapMinus <->"
-      (MapTimes _) -> "MapTimes <*>"
-      (MapDiv   _) -> "MapDiv </>"
-      (MapMod   _) -> "MapMod <%>"
-      (CompLT   _) -> "Less Than <"
-      (CompLE   _) -> "Less or equal <="
-      (CompGT   _) -> "Greater than >"
-      (CompGE   _) -> "Greater or equal >="
-      (CompEQ   _) -> "Equals =="
-      (CompNE   _) -> "Not equal /="
-      (CompAt   _) -> "Is Member Of @"
-      (And      _) -> "Conjunction And"
-      (Or       _) -> "Disjunction Or"
+      (Plus     _) -> "Plus (+)"
+      (Minus    _) -> "Minus (-)"
+      (Times    _) -> "Times (*)"
+      (Div      _) -> "Div (/)"
+      (Mod      _) -> "Mod (%)"
+      (SetUnion _) -> "SetUnion (++)"
+      (SetMinus _) -> "SetMinus (\\)"
+      (SetInter _) -> "SetInter (><)"
+      (MapPlus  _) -> "MapPlus (<+>)"
+      (MapMinus _) -> "MapMinus (<->)"
+      (MapTimes _) -> "MapTimes (<*>)"
+      (MapDiv   _) -> "MapDiv (</>)"
+      (MapMod   _) -> "MapMod (<%>)"
+      (CompLT   _) -> "Less Than (<)"
+      (CompLE   _) -> "Less or equal (<=)"
+      (CompGT   _) -> "Greater than (>)"
+      (CompGE   _) -> "Greater or equal (>=)"
+      (CompEQ   _) -> "Equals (==)"
+      (CompNE   _) -> "Not equal (/=)"
+      (CompAt   _) -> "Is Member Of (@)"
+      (And      _) -> "Conjunction (And)"
+      (Or       _) -> "Disjunction (Or)"
 
 instance Show UnOp where
   show x =
