@@ -162,7 +162,7 @@ Exp
   |     '-'   Exp %prec NEG                 {Unary  (Negative (tp $1)) $2}
 
   | '(' Exp ')'                             {$2}
-  | '{' Conts '}'                           {Set $2}
+  | '{' Conts '}'                           {Set $2 (tp $1)}
   | num                                     {IntConst (extract' $1)}
   | Bool                                    {BoolConst $1}
   | str                                     {StrConst (extract $1)}
