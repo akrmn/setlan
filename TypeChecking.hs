@@ -122,7 +122,7 @@ expType _ (StrConst _)  = StrType
 expType sts (Var (Id var pos))   =
   if isNothing varDef
     then error' pos (
-      "Variable " ++ var ++ " not declared in this scope."
+      "Variable `" ++ var ++ "` not declared in this scope."
     )
     else varType $ fromJust varDef
   where varDef = deepLookup var sts

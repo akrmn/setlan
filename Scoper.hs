@@ -90,7 +90,7 @@ scoper' sts (Block declares insts pos) =
 scoper' sts (Scan (Id name pos) _) =
   if isNothing varDef
     then error' pos (
-      "Variable " ++ name ++ " not declared in this scope."
+      "Variable `" ++ name ++ "` not declared in this scope."
     )
     else []
   where
