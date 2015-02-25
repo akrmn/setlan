@@ -21,8 +21,8 @@ executable setlan
   -- other-extensions:
   build-depends:       base >=4.7 && <4.8,
                        array >=0.5,
-                       derive,
-                       containers
+                       containers >=0.5.5.1,
+                       safe >=0.3.8
   build-tools:         alex,
                        happy
   -- hs-source-dirs:

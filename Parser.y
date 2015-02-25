@@ -1,7 +1,8 @@
 {
-module Parser (
-  parser,
-  parsr
+module Parser
+( parser
+, parsr
+, tp
 ) where
 import Tokens
 import AST
@@ -166,7 +167,7 @@ Exp
   | num                                     {IntConst (extract' $1)}
   | Bool                                    {BoolConst $1}
   | str                                     {StrConst (extract $1)}
-  | id                                      {Var (extract $1)}
+  | Name                                    {Var $1}
 
 Bool
   : true                                    {True}
@@ -182,12 +183,12 @@ Insts
   |                                         {[]}
 
 Inst
-  : id '=' Exp                              {Assign (extract $1) $3 (tp $1)}
+  : Name '=' Exp                            {Assign $1 $3 ((\(Id _ p) -> p) $1)}
 
   | '{' using Declares in Insts '}'         {Block $3 $5 (tp $1)}
   | '{' Insts '}'                           {Block [] $2 (tp $1)}
 
-  | scan id                                 {Scan    (extract $2)           (tp $1)}
+  | scan Name                               {Scan    $2                     (tp $1)}
   | print Conts                             {Print   $2                     (tp $1)}
   | println Conts                           {Print  ($2 ++ [StrConst "\n"]) (tp $1)}
 
@@ -198,7 +199,7 @@ Inst
   | while '(' Exp ')' do Inst               {RWD Nothing   $3 (Just $6) (tp $1)}
   | repeat Inst while '(' Exp ')'           {RWD (Just $2) $5 Nothing   (tp $3)}
 
-  | for Var Dir Exp do Inst                  {For $2 $3 $4 $6 (tp $1)}
+  | for Name Dir Exp do Inst                {For $2 $3 $4 $6 (tp $1)}
 
 Dir
   : min                                     {Min}
@@ -208,18 +209,18 @@ Declares
   : Declare ';' Declares                    {$1 : $3}
   | Declare ';'                             {[$1]}
 
-Declare : Type Vars                         {Declare $1 $2}
+Declare : Type Names                        {Declare $1 $2}
 
 Type
   : bool                                    {BoolType}
   | int                                     {IntType}
   | set                                     {SetType}
 
-Vars
-  : Var ',' Vars                            {$1 : $3}
-  | Var                                     {[$1]}
-Var
-  : id                                      {extract $1}
+Names
+  : Name ',' Names                          {$1 : $3}
+  | Name                                    {[$1]}
+Name
+  : id                                      {Id (extract $1) (tp $1)}
 
 {
 
@@ -244,7 +245,7 @@ parser text name = do
   let toks = alexScanTokens text
   if any isTokenError toks
     then mapM_ printError $ filter isTokenError toks
-    else putStrLn . show' . parsr $ toks
+    else putStrLn . show . parsr $ toks
   putStrLn ""
 
 }

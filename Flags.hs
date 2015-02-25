@@ -8,7 +8,7 @@ data Flag
   = WrongFlag
   | DoLex
   | DoParse
-  | DoContext
+  | DoScope
   deriving (Eq, Show, Ord)
 
 toFlag :: Char -> Flag
@@ -18,8 +18,8 @@ toFlag 'l' = DoLex
 toFlag 'a' = DoParse
 toFlag 'p' = DoParse
 
-toFlag 's' = DoContext
-toFlag 'c' = DoContext
+toFlag 's' = DoScope
+toFlag 'c' = DoScope
 
 toFlag  _  = WrongFlag
 

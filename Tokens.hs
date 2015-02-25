@@ -1,11 +1,15 @@
-module Tokens where
+module Tokens
+( Pos(..)
+, Token(..)
+, token_posn
+, error'
+, printError
+, isTokenError
+) where
 
 data Pos = Pos Int Int deriving Eq
 instance Show Pos where
     show (Pos l c) = "(Line " ++ show l ++ ", Col " ++ show c ++ ")"
-
-error' :: Pos -> String -> a
-error' p m = error $ m ++ " (" ++ show pos ++ ")"
 
 data Token
     -- language --
@@ -150,6 +154,15 @@ token_posn t = case t of
     -- errors --
     (TokenError _ p) -> p
     (TokenIntError _ p) -> p
+
+error' :: Pos -> String -> a
+error' p m = error $ show p ++ " " ++ m
+
+printError :: Token -> IO ()
+printError (TokenError s p) = do
+  putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
+printError (TokenIntError s p) = do
+  putStrLn $ "Error: integer out of range (-2^31 .. 2^31-1) \"" ++ s ++ "\" " ++ show p
 
 isTokenError :: Token -> Bool
 isTokenError (TokenError    _ _) = True

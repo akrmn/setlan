@@ -1,23 +1,35 @@
-module AST where
+module AST
+( Program(..)
+, Inst(..)
+, Direction(..)
+, Declare(..)
+, Type(..)
+, Id(..)
+, Exp(..)
+, BinOp(..)
+, UnOp(..)
+, tabs
+, intersperse
+) where
 
 import Data.List (intersperse)
 import Tokens (Pos)
 
-data Program = Program Inst deriving (Eq, Show)
+data Program = Program Inst deriving (Eq)
 
 data Inst
-  = Assign  String Exp Pos
+  = Assign  Id Exp Pos
   | Block   [Declare] [Inst] Pos
-  | Scan    String Pos
+  | Scan    Id Pos
   | Print   [Exp] Pos
   | If      Exp Inst (Maybe Inst) Pos
   | RWD     (Maybe Inst) Exp (Maybe Inst) Pos
-  | For     String Direction Exp Inst Pos
+  | For     Id Direction Exp Inst Pos
   deriving (Eq, Show)
 
 data Direction = Min | Max deriving (Eq, Show)
 
-data Declare = Declare Type [String] deriving (Eq, Show)
+data Declare = Declare Type [Id] deriving (Eq, Show)
 
 data Type
   = BoolType
@@ -26,6 +38,8 @@ data Type
   | StrType
   deriving (Eq)
 
+data Id = Id String Pos deriving (Eq)
+
 data Exp
   = Binary     BinOp   Exp  Exp
   | Unary      UnOp    Exp
@@ -33,40 +47,40 @@ data Exp
   | IntConst   Int
   | BoolConst  Bool
   | StrConst   String
-  | Var        String
+  | Var        Id
   deriving (Eq, Show)
 
 data BinOp
-  = Plus     Pos
-  | Minus    Pos
-  | Times    Pos
-  | Div      Pos
-  | Mod      Pos
-  | SetUnion Pos
-  | SetMinus Pos
-  | SetInter Pos
-  | MapPlus  Pos
-  | MapMinus Pos
-  | MapTimes Pos
-  | MapDiv   Pos
-  | MapMod   Pos
-  | CompLT   Pos
-  | CompLE   Pos
-  | CompGT   Pos
-  | CompGE   Pos
-  | CompEQ   Pos
-  | CompNE   Pos
-  | CompAt   Pos
-  | And      Pos
-  | Or       Pos
+  = Plus     {getPosB :: Pos}
+  | Minus    {getPosB :: Pos}
+  | Times    {getPosB :: Pos}
+  | Div      {getPosB :: Pos}
+  | Mod      {getPosB :: Pos}
+  | SetUnion {getPosB :: Pos}
+  | SetMinus {getPosB :: Pos}
+  | SetInter {getPosB :: Pos}
+  | MapPlus  {getPosB :: Pos}
+  | MapMinus {getPosB :: Pos}
+  | MapTimes {getPosB :: Pos}
+  | MapDiv   {getPosB :: Pos}
+  | MapMod   {getPosB :: Pos}
+  | CompLT   {getPosB :: Pos}
+  | CompLE   {getPosB :: Pos}
+  | CompGT   {getPosB :: Pos}
+  | CompGE   {getPosB :: Pos}
+  | CompEQ   {getPosB :: Pos}
+  | CompNE   {getPosB :: Pos}
+  | CompAt   {getPosB :: Pos}
+  | And      {getPosB :: Pos}
+  | Or       {getPosB :: Pos}
   deriving (Eq)
 
 data UnOp
-  = SetMax   Pos
-  | SetMin   Pos
-  | SetSize  Pos
-  | Not      Pos
-  | Negative Pos
+  = SetMax   {getPosU :: Pos}
+  | SetMin   {getPosU :: Pos}
+  | SetSize  {getPosU :: Pos}
+  | Not      {getPosU :: Pos}
+  | Negative {getPosU :: Pos}
   deriving (Eq)
 
 ------------------------
@@ -76,37 +90,37 @@ data UnOp
 tabs :: Int -> String
 tabs = concat . flip replicate "    "
 
-show' :: Program -> String
-show' = show'' 0
+instance Show Program where
+  show = show' 0
 
-class Show'' a where
-  show'' :: Int -> a -> String
+class Show' a where
+  show' :: Int -> a -> String
 
-instance Show'' Program where
-  show'' n (Program inst) = "Program\n" ++ (show'' (n+1) inst)
+instance Show' Program where
+  show' n (Program inst) = "Program\n" ++ (show' (n+1) inst)
 
-instance Show'' Inst where
-  show'' n x = (tabs n) ++
+instance Show' Inst where
+  show' n x = (tabs n) ++
     case x of
-      (Assign v e _) ->
+      (Assign (Id v _) e _) ->
         "Assign\n" ++
           (tabs (n+1)) ++ "variable\n" ++
             (tabs (n+2)) ++ v ++ "\n" ++
           (tabs (n+1)) ++ "value\n" ++
-            (show'' (n+2) e)
+            (show' (n+2) e)
 
       (Block [] is _) ->
         "Block\n" ++
-          (concat $ intersperse "\n" (map (show'' (n+1)) is))
+          (concat $ intersperse "\n" (map (show' (n+1)) is))
 
       (Block ds is _) ->
         "Block\n" ++
           (tabs (n+1)) ++ "Using\n" ++
-            (concat $ intersperse "\n" (map (show'' (n+2)) ds)) ++ "\n" ++
+            (concat $ intersperse "\n" (map (show' (n+2)) ds)) ++ "\n" ++
           (tabs (n+1)) ++ "In\n" ++
-          (concat $ intersperse "\n" (map (show'' (n+1)) is))
+          (concat $ intersperse "\n" (map (show' (n+1)) is))
 
-      (Scan v _) ->
+      (Scan (Id v _) _) ->
         "Scan\n" ++
           (tabs (n+1)) ++ "variable\n" ++
             (tabs (n+2)) ++ v
@@ -114,59 +128,59 @@ instance Show'' Inst where
       (Print es _) ->
         "Print\n" ++
           (tabs (n+1)) ++ "elements\n" ++
-            (concat $ intersperse "\n" (map (show'' (n+2)) es))
+            (concat $ intersperse "\n" (map (show' (n+2)) es))
 
       (If c t Nothing _) ->
         "If\n" ++
           (tabs (n+1)) ++ "condition\n" ++
-            (show'' (n+2) c) ++ "\n" ++
+            (show' (n+2) c) ++ "\n" ++
           (tabs (n+1)) ++ "Then\n" ++
-            (show'' (n+2) t)
+            (show' (n+2) t)
 
       (If c t (Just e) _) ->
         "If\n" ++
           (tabs (n+1)) ++ "condition\n" ++
-            (show'' (n+2) c) ++ "\n" ++
+            (show' (n+2) c) ++ "\n" ++
           (tabs (n+1)) ++ "Then\n" ++
-            (show'' (n+2) t) ++ "\n" ++
+            (show' (n+2) t) ++ "\n" ++
           (tabs (n+1)) ++"Else\n" ++
-            (show'' (n+2) e)
+            (show' (n+2) e)
 
       (RWD Nothing w (Just d) _) ->
         "While\n" ++
-          (show'' (n+1) w) ++ "\n" ++
+          (show' (n+1) w) ++ "\n" ++
         (tabs n) ++ "Do\n" ++
-          (show'' (n+1) d)
+          (show' (n+1) d)
 
       (RWD (Just r) w Nothing _) ->
         "Repeat\n" ++
-          (show'' (n+1) r) ++ "\n" ++
+          (show' (n+1) r) ++ "\n" ++
         (tabs n) ++ "While\n" ++
-          (show'' (n+1) w)
+          (show' (n+1) w)
 
       (RWD (Just r) w (Just d) _) ->
         "Repeat\n" ++
-          (show'' (n+1) r) ++ "\n" ++
+          (show' (n+1) r) ++ "\n" ++
         (tabs n) ++ "While\n" ++
-          (show'' (n+1) w) ++ "\n" ++
+          (show' (n+1) w) ++ "\n" ++
         (tabs n) ++ "Do\n" ++
-          (show'' (n+1) d)
+          (show' (n+1) d)
 
-      (For v d s i _) ->
+      (For (Id v _) d s i _) ->
         "For\n" ++
           (tabs (n+1)) ++ "variable\n" ++
             (tabs (n+2)) ++ v ++ "\n" ++
           (tabs (n+1)) ++ "direction\n" ++
             (tabs (n+2)) ++ show d ++ "\n" ++
           (tabs (n+1)) ++ "in\n" ++
-            (show'' (n+2) s) ++ "\n" ++
+            (show' (n+2) s) ++ "\n" ++
           (tabs (n+1)) ++ "do\n" ++
-            (show'' (n+2) i)
+            (show' (n+2) i)
 
-instance Show'' Declare where
-  show'' n (Declare t vs) =
+instance Show' Declare where
+  show' n (Declare t vs) =
     tabs n ++ show t ++ "\n" ++
-    (concat $ intersperse "\n" (map (tabs (n+1) ++) vs))
+      (concat $ intersperse "\n" (map ((tabs (n+1) ++) . show) vs))
 
 instance Show Type where
   show x =
@@ -176,21 +190,24 @@ instance Show Type where
       SetType   -> "set"
       StrType   -> "string"
 
-instance Show'' Exp where
-  show'' n x = (tabs n) ++
+instance Show Id where
+  show (Id v _) = v
+
+instance Show' Exp where
+  show' n x = (tabs n) ++
     case x of
       (Binary op a b) ->
         show op ++ "\n" ++
-          (show'' (n+1) a) ++ "\n" ++
-          (show'' (n+1) b)
+          (show' (n+1) a) ++ "\n" ++
+          (show' (n+1) b)
 
       (Unary  op a) ->
         show op ++ "\n" ++
-          (show'' (n+1) a)
+          (show' (n+1) a)
 
-      (Set    es) ->
+      (Set    es _) ->
         "Set\n" ++
-          (concat $ intersperse "\n" (map (show'' (n+1)) es))
+          (concat $ intersperse "\n" (map (show' (n+1)) es))
 
       (IntConst  a) ->
         "Int\n" ++
@@ -206,7 +223,7 @@ instance Show'' Exp where
 
       (Var       a) ->
         "Variable\n" ++
-          (tabs (n+1)) ++ a
+          (tabs (n+1)) ++ (show a)
 
 instance Show BinOp where
   show x =

@@ -1,17 +1,12 @@
 module Main (main) where
 
 import Flags
-import Lexer (lexer)
+import Lexer  (lexer)
 import Parser (parser)
+import Scoper (scoper)
 import System.Environment
 import System.IO
 import Control.Monad (liftM, mapM)
-
-context :: String -> String -> IO ()
-context text name = do
-    putStrLn $ "Context (" ++ name ++ "):\n"
-    putStrLn "ajndkjandk"
-    putStrLn ""
 
 help :: String
 help = unlines
@@ -28,15 +23,15 @@ help = unlines
     ]
 
 run :: Flag -> (String -> String -> IO ())
-run DoLex     = lexer
-run DoParse   = parser
-run DoContext = context
+run DoLex   = lexer
+run DoParse = parser
+run DoScope = scoper
 
 main :: IO ()
 main = do
     flags <- liftM takeFlags getArgs
     let flags' = if null flags
-        then [DoContext]
+        then [DoScope]
         else flags
 
     files <- liftM takeFiles getArgs

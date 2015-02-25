@@ -1,8 +1,9 @@
 module TypeChecking where
 
-import Parser (tp)
-import AST hiding (show')
+import AST
 import Tokens (error')
+import SymbolTable
+
 import Data.List (intersperse)
 import Data.Maybe (fromJust, isNothing)
 
@@ -16,7 +17,7 @@ setOp :: [(Type, Type, Type)]
 setOp =  [(SetType, SetType, SetType)]
 
 relOp :: [(Type, Type, Type)]
-compintOp =  [(IntType, IntType, BoolType)]
+relOp =  [(IntType, IntType, BoolType)]
 
 compOp :: [(Type, Type, Type) ]
 compOp =  [(SetType,  SetType,  BoolType)
@@ -44,10 +45,10 @@ binType (MapMinus _) = mapOp
 binType (MapTimes _) = mapOp
 binType (MapDiv   _) = mapOp
 binType (MapMod   _) = mapOp
-binType (CompLT   _) = compintOp
-binType (CompLE   _) = compintOp
-binType (CompGT   _) = compintOp
-binType (CompGE   _) = compintOp
+binType (CompLT   _) = relOp
+binType (CompLE   _) = relOp
+binType (CompGT   _) = relOp
+binType (CompGE   _) = relOp
 binType (CompEQ   _) = compOp
 binType (CompNE   _) = compOp
 binType (CompAt   _) = atOp
@@ -56,16 +57,16 @@ binType (Or       _) = boolOp
 
 binCheck :: Type -> Type -> (Type, Type, Type) -> [Type]
 binCheck a b (c, d, e) =
-  if a == d && b == e
+  if a == c && b == d
     then [e]
   else []
 
 unType :: UnOp -> [(Type, Type)]
-UnType (SetMax   _) = [(SetType, IntType)]
-UnType (SetMin   _) = [(SetType, IntType)]
-UnType (SetSize  _) = [(SetType, IntType)]
-UnType (Not      _) = [(BoolType, BoolType)]
-UnType (Negative _) = [(IntType, IntType)]
+unType (SetMax   _) = [(SetType, IntType)]
+unType (SetMin   _) = [(SetType, IntType)]
+unType (SetSize  _) = [(SetType, IntType)]
+unType (Not      _) = [(BoolType, BoolType)]
+unType (Negative _) = [(IntType, IntType)]
 
 unCheck :: Type -> (Type, Type) -> [Type]
 unCheck a (b, c) =
@@ -77,34 +78,38 @@ expType :: [SymbolTable] -> Exp -> Type
 expType sts (Binary binOp exp0 exp1) =
   if null matches
     then error' pos (
-      "Operator " ++ show binOp ++ "expects\n    " ++
-      concat intersperse " or\n    " (map show' expected) ++
-      "but received\n    " ++ show type0 ++ ", " ++ show type1
+      "Operator " ++ show binOp ++ " expects\n    " ++ (
+        concat $ intersperse " or\n    " (map show' expected)
+      ) ++
+      "\nbut received\n    " ++ show type0 ++ ", " ++ show type1
       )
     else head matches
-  where matches         = (binCheck type0 type1) =<< expected
-        type0           = expType sts exp0
-        type1           = expType sts exp1
-        expected        = binType binOp
-        show' (x, y, _) = show x ++ ", " ++ show y
-        pos             = tp binOp
+  where
+    matches         = (binCheck type0 type1) =<< expected
+    type0           = expType sts exp0
+    type1           = expType sts exp1
+    expected        = binType binOp
+    show' (x, y, _) = show x ++ ", " ++ show y
+    pos             = getPosB binOp
 
 
-expType sts (Unary unOp exp) =
+expType sts (Unary unOp exp0) =
   if null matches
     then error' pos (
       "Operator " ++ show unOp ++ "expects\n    " ++
-      show expected ++ "but received\n    " ++ show expType exp0
+      show expected ++ "\nbut received\n    " ++ show type0
       )
     else head matches
-  where matches  = (unCheck expType exp) =<< expected
-        expected = unType unOp
-        pos      = tp unOp
+  where
+    matches  = (unCheck type0) =<< expected
+    type0    = expType sts exp0
+    expected = unType unOp
+    pos      = getPosU unOp
 
 expType sts (Set exps pos) =
-  if all (\x -> expType sts x == IntType)
+  if all (\x -> expType sts x == IntType) exps
     then SetType
-    else error' pos(
+    else error' pos (
       "Set can only have integer values"
     )
 
@@ -114,16 +119,10 @@ expType _ (BoolConst _) = BoolType
 
 expType _ (StrConst _)  = StrType
 
-expType sts (Var var)   =
+expType sts (Var (Id var pos))   =
   if isNothing varDef
     then error' pos (
       "Variable " ++ var ++ " not declared in this scope."
     )
     else varType $ fromJust varDef
   where varDef = deepLookup var sts
-
-varType :: Variable -> Type
-varType (IntVar  _ _) = IntType
-varType (BoolVar _ _) = BoolType
-varType (SetVar  _ _) = SetType
-varType (StrVar  _ _) = StrType

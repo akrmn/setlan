@@ -1,15 +1,17 @@
 module SymbolTable where
 
-import AST (Type(..))
+import AST (Type(..), tabs, intersperse)
 
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 import Prelude hiding (lookup)
 
+
 varType :: Variable -> Type
-varType (IntVar  _) = IntType
-varType (BoolVar _) = BoolType
-varType (SetVar  _) = SetType
+varType (IntVar  _ _) = IntType
+varType (BoolVar _ _) = BoolType
+varType (SetVar  _ _) = SetType
+varType (StrVar  _ _) = StrType
 
 data ScopeType = BlockScope | ForScope deriving (Eq, Show)
 
@@ -30,10 +32,33 @@ data Variable
 
 data SymbolTable
   = SymbolTable
-  { variables :: Map.Map String Variable
-  , daughters :: [SymbolTable]
-  }
-  deriving (Show)
+    { variables :: Map.Map String Variable
+    , daughters :: [SymbolTable]
+    }
+
+instance Show SymbolTable where
+  show = show' 0
+
+show' :: Int -> SymbolTable -> String
+show' n (SymbolTable variables daughters) =
+  tabs n ++ "SCOPE\n" ++
+    tabs (n+1) ++ (
+      concat $
+        intersperse
+          ("\n" ++ (tabs (n+1)))
+          (map show'' (Map.toList variables))
+    ) ++ "\n" ++ (
+      concat $ map (show' (n+1)) daughters
+    )
+
+show'' :: (String, Variable) -> String
+show'' (name, var) =
+  name ++ " :: " ++
+    case var of
+      (IntVar  x _) -> "int, value = 0"
+      (BoolVar x _) -> "bool, value = false"
+      (SetVar  x _) -> "set, value = {}"
+      (StrVar  x _) -> "str, value = \"\""
 
 empty :: SymbolTable
 empty =

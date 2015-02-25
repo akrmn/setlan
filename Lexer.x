@@ -1,10 +1,10 @@
 {
 module Lexer
-(
-    lexer,
-    printError,
-    alexScanTokens
+( lexer
+, printError
+, alexScanTokens
 ) where
+
 import Tokens
 }
 
@@ -123,12 +123,6 @@ lexInt p s
   | n < 2^31   = TokenInt      n (toPos p)
   | otherwise  = TokenIntError s (toPos p)
   where n = (read s :: (Num a, Read a) => a)
-
-printError :: Token -> IO ()
-printError (TokenError s p) = do
-  putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
-printError (TokenIntError s p) = do
-  putStrLn $ "Error: integer out of range (-2^31 .. 2^31-1) \"" ++ s ++ "\" " ++ show p
 
 lexer :: String -> String -> IO ()
 -- Calls the Alex token scanner and then prints found tokens. If there are any

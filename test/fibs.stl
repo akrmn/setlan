@@ -12,18 +12,18 @@ program {
         println "fib(0) = 1"
     else {
         using
-            int low, high, count, tmp;
+            int l, h, c, t;
         in
 
-        count = 0;
-        low = 0;
-        high = 1;
-        while (count <= n) do {
-            tmp = low + high;
-            low = high;
-            high = tmp;
-            println "fib(", count, ") = ", low;
-            count = count + 1;
+        c = 0;
+        l = 0;
+        h = 1;
+        while (c <= n) do {
+            t = l + h;
+            l = h;
+            h = t;
+            println "fib(", c, ") = ", l;
+            c = c + 1;
         };
     }
     ; # del `if` exterior

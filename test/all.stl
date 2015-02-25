@@ -17,7 +17,7 @@ program {
 
   if (b @ c)
     for i min d ++ c do
-      c = c + i * 2
+      c = c <+> i * 2
   else if (b @ c) {
     println "improbable";
   };
