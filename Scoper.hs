@@ -7,10 +7,12 @@ import Safe (headMay)
 
 import Lexer (alexScanTokens, printError)
 import Parser (parsr)
-import Tokens (error', isTokenError)
+import Tokens (error', isTokenError, Pos)
 import TypeChecking
 import SymbolTable
 import AST
+
+data ScopeError = ScopeError Pos String
 
 scoper :: String -> String -> IO ()
 scoper text name = do
@@ -23,9 +25,9 @@ scoper text name = do
 
 scoper'' :: Program -> String
 scoper'' (Program inst) =
-  if null scopes
+  if null (fst scopes)
     then "No Scopes"
-    else show $ head scopes
+    else show $ (head (fst scopes))
   where
     scopes = scoper' [] inst
 
@@ -54,22 +56,25 @@ getVars' t vars ((Id name pos):xs) = getVars' t vars' xs
         "Variable `" ++ name ++ "` already declared in this scope."
       )
 
-scoper' :: [SymbolTable] -> Inst -> [SymbolTable]
+scoper' :: [SymbolTable] -> Inst -> ([SymbolTable], [ScopeError])
 scoper' sts (Assign (Id name _) value pos) =
   if isNothing varDef
-    then error' pos (
+    then ([], [ScopeError pos (
       "Variable `" ++ name ++ "` not declared in this scope."
+      )]
     )
     else if scope == ForScope
-      then error' pos (
+      then ([], [ScopeError pos (
         "Cannot reassign iteration variable."
+        )]
       )
       else if lType /= rType
-        then error' pos (
+        then ([], [ScopeError pos (
           "Variable " ++ name ++ "::" ++ show lType ++
           " cannot receive " ++ show rType ++ " expression in assignment."
+          )]
         )
-        else []
+        else ([],[])
   where
     varDef = deepLookup name sts
     scope  = scopeType (fromJust varDef)
@@ -78,21 +83,22 @@ scoper' sts (Assign (Id name _) value pos) =
 
 scoper' sts (Block declares insts pos) =
   if null declares
-    then []
-    else [newST]
+    then ([], [])
+    else ([newST], [])
   where
     newST = SymbolTable
       { variables = getVars Map.empty declares
-      , daughters = (scoper' sts') =<< insts
+      , daughters = (map fst ((scoper' sts') =<< insts))
       }
     sts' = newST : sts
 
 scoper' sts (Scan (Id name pos) _) =
   if isNothing varDef
-    then error' pos (
+    then ([], [ScopeError pos (
       "Variable `" ++ name ++ "` not declared in this scope."
+      )]
     )
-    else []
+    else ([], [])
   where
     varDef = deepLookup name sts
 
@@ -101,14 +107,14 @@ scoper' sts (Print exps pos) =
 
 scoper' sts (If cond thn els pos) =
   if condType /= BoolType
-    then error' pos (
-      "`If` instruction expects bool expression, not " ++
-      show condType
+    then ([], [ScopeError pos (
+      "`If` instruction expects bool expression, not " ++ show condType
+      )]
     )
     else scoper' sts thn  ++ (
       if isJust els
         then scoper' sts (fromJust els)
-        else []
+        else ([], [])
     )
   where condType = expType sts cond
 
@@ -116,28 +122,26 @@ scoper' sts (RWD r cond d pos) =
   (
     if isJust r
       then scoper' sts (fromJust r)
-      else []
+      else ([], [])
   ) ++ (
     if condType /= BoolType
-      then error' pos (
-        "`While` instruction expects bool expression, not " ++
-        show condType
-      )
-      else []
+      then ([], [ScopeError pos (
+        "`While` instruction expects bool expression, not " ++ show condType
+      )])
+      else ([], [])
   ) ++ (
     if isJust d
       then scoper' sts (fromJust d)
-      else []
+      else ([], [])
   )
     where condType = expType sts cond
 
 scoper' sts (For (Id name _) _ range inst pos) =
   if rangeType /= SetType
-    then error' pos (
-      "`For` instruction expects set expression, not " ++
-      show rangeType
-    )
-    else [newST]
+    then ([], [ScopeError pos (
+      "`For` instruction expects set expression, not " ++ show rangeType
+    )])
+    else ([newST], [])
   where
     rangeType = expType sts range
     newST     = SymbolTable
