@@ -123,6 +123,10 @@ import Lexer
 %right not
 %right NEG
 
+-- Statement precedence --
+-- -- if then else --
+%right then else
+
 %%
 
 Program
@@ -193,7 +197,7 @@ Inst
   | println Conts                           {Print  ($2 ++ [StrConst "\n"]) (tp $1)}
 
   | if '(' Exp ')' Inst else Inst           {If  $3 $5 (Just $7) (tp $1)}
-  | if '(' Exp ')' Inst                     {If  $3 $5 Nothing   (tp $1)}
+  | if '(' Exp ')' Inst  %prec then         {If  $3 $5 Nothing   (tp $1)}
 
   | repeat Inst while '(' Exp ')' do Inst   {RWD (Just $2) $5 (Just $8) (tp $3)}
   | while '(' Exp ')' do Inst               {RWD Nothing   $3 (Just $6) (tp $1)}
