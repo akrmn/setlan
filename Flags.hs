@@ -1,14 +1,17 @@
-module Flags where
+module Flags
+( Flag(..)
+, takeFlags
+, takeFiles
+) where
 
 import Data.List (nub, sort)
-import System.Environment
-import System.IO
 
 data Flag
   = WrongFlag
   | DoLex
   | DoParse
   | DoScope
+  | DoInterpret
   deriving (Eq, Show, Ord)
 
 toFlag :: Char -> Flag
@@ -20,6 +23,9 @@ toFlag 'p' = DoParse
 
 toFlag 's' = DoScope
 toFlag 'c' = DoScope
+
+toFlag 'i' = DoInterpret
+toFlag 'e' = DoInterpret
 
 toFlag  _  = WrongFlag
 

@@ -1,10 +1,9 @@
 module Tokens
 ( Pos(..)
 , Token(..)
-, token_posn
-, error'
-, printError
 , isTokenError
+, printError
+, tp
 ) where
 
 data Pos = Pos Int Int deriving Eq
@@ -67,8 +66,8 @@ data Token
     | TokenIntError String Pos
     deriving (Eq, Show)
 
-token_posn :: Token -> Pos
-token_posn t = case t of
+tp :: Token -> Pos
+tp t = case t of
     -- language --
     (TokenProgram p) -> p
     (TokenUsing p) -> p
@@ -155,14 +154,12 @@ token_posn t = case t of
     (TokenError _ p) -> p
     (TokenIntError _ p) -> p
 
-error' :: Pos -> String -> a
-error' p m = error $ show p ++ " " ++ m
-
 printError :: Token -> IO ()
 printError (TokenError s p) = do
   putStrLn $ "Error: unexpected token \"" ++ s ++ "\" " ++ show p
 printError (TokenIntError s p) = do
-  putStrLn $ "Error: integer out of range (-2^31 .. 2^31-1) \"" ++ s ++ "\" " ++ show p
+  putStrLn $ "Error: integer out of range (-2^31 .. 2^31-1) \"" ++ s ++
+    "\" " ++ show p
 
 isTokenError :: Token -> Bool
 isTokenError (TokenError    _ _) = True

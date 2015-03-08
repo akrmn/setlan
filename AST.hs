@@ -9,10 +9,10 @@ module AST
 , BinOp(..)
 , UnOp(..)
 , tabs
-, intersperse
 ) where
 
-import Data.List (intersperse)
+import Data.List (intercalate)
+
 import Tokens (Pos)
 
 data Program = Program Inst deriving (Eq)
@@ -29,13 +29,14 @@ data Inst
 
 data Direction = Min | Max deriving (Eq, Show)
 
-data Declare = Declare Type [Id] deriving (Eq, Show)
+data Declare = Declare Type Id deriving (Eq, Show)
 
 data Type
   = BoolType
   | IntType
   | SetType
   | StrType
+  | TypeError [String]
   deriving (Eq)
 
 data Id = Id String Pos deriving (Eq)
@@ -44,8 +45,8 @@ data Exp
   = Binary     BinOp   Exp  Exp
   | Unary      UnOp    Exp
   | Set        [Exp]   Pos
-  | IntConst   Int
   | BoolConst  Bool
+  | IntConst   Int
   | StrConst   String
   | Var        Id
   deriving (Eq, Show)
@@ -111,14 +112,14 @@ instance Show' Inst where
 
       (Block [] is _) ->
         "Block\n" ++
-          (concat $ intersperse "\n" (map (show' (n+1)) is))
+          (intercalate "\n" (map (show' (n+1)) is))
 
       (Block ds is _) ->
         "Block\n" ++
           (tabs (n+1)) ++ "Using\n" ++
-            (concat $ intersperse "\n" (map (show' (n+2)) ds)) ++ "\n" ++
+            (intercalate "\n" (map (show' (n+2)) ds)) ++ "\n" ++
           (tabs (n+1)) ++ "In\n" ++
-          (concat $ intersperse "\n" (map (show' (n+1)) is))
+          (intercalate "\n" (map (show' (n+1)) is))
 
       (Scan (Id v _) _) ->
         "Scan\n" ++
@@ -128,7 +129,7 @@ instance Show' Inst where
       (Print es _) ->
         "Print\n" ++
           (tabs (n+1)) ++ "elements\n" ++
-            (concat $ intersperse "\n" (map (show' (n+2)) es))
+            (intercalate "\n" (map (show' (n+2)) es))
 
       (If c t Nothing _) ->
         "If\n" ++
@@ -178,17 +179,17 @@ instance Show' Inst where
             (show' (n+2) i)
 
 instance Show' Declare where
-  show' n (Declare t vs) =
-    tabs n ++ show t ++ "\n" ++
-      (concat $ intersperse "\n" (map ((tabs (n+1) ++) . show) vs))
+  show' n (Declare t v) =
+    tabs n ++ show t ++ " " ++ show v
 
 instance Show Type where
   show x =
     case x of
-      BoolType  -> "bool"
-      IntType   -> "int"
-      SetType   -> "set"
-      StrType   -> "string"
+      BoolType    -> "bool"
+      IntType     -> "int"
+      SetType     -> "set"
+      StrType     -> "string"
+      TypeError _ -> "_"
 
 instance Show Id where
   show (Id v _) = v
@@ -206,23 +207,23 @@ instance Show' Exp where
           (show' (n+1) a)
 
       (Set    es _) ->
-        "Set\n" ++
-          (concat $ intersperse "\n" (map (show' (n+1)) es))
+        "set\n" ++
+          (intercalate "\n" (map (show' (n+1)) es))
 
       (IntConst  a) ->
-        "Int\n" ++
+        "int\n" ++
           (tabs (n+1)) ++ show a
 
       (BoolConst a) ->
-        "Boolean\n" ++
+        "boolean\n" ++
           (tabs (n+1)) ++ show a
 
       (StrConst  a) ->
-        "String\n" ++
+        "string\n" ++
           (tabs (n+1)) ++ show a
 
       (Var       a) ->
-        "Variable\n" ++
+        "variable\n" ++
           (tabs (n+1)) ++ (show a)
 
 instance Show BinOp where
@@ -248,14 +249,14 @@ instance Show BinOp where
       (CompEQ   _) -> "Equals (==)"
       (CompNE   _) -> "Not equal (/=)"
       (CompAt   _) -> "Is Member Of (@)"
-      (And      _) -> "Conjunction (And)"
-      (Or       _) -> "Disjunction (Or)"
+      (And      _) -> "Conjunction (and)"
+      (Or       _) -> "Disjunction (or)"
 
 instance Show UnOp where
   show x =
     case x of
-      (SetMax   _) -> "SetMax >?"
-      (SetMin   _) -> "SetMin <?"
-      (SetSize  _) -> "SetSize $?"
-      (Not      _) -> "Negation Not"
+      (SetMax   _) -> "SetMax (>?)"
+      (SetMin   _) -> "SetMin (<?)"
+      (SetSize  _) -> "SetSize ($?)"
+      (Not      _) -> "Negation (not)"
       (Negative _) -> "Negative (-)"

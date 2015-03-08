@@ -1,14 +1,26 @@
-module TypeChecking where
+module TypeChecking
+( expType
+) where
 
-import AST
-import Tokens (error')
-import SymbolTable
+import Data.List (intercalate)
 
-import Data.List (intersperse)
-import Data.Maybe (fromJust, isNothing)
+import AST (
+    Type(..)
+  , Id(..)
+  , Exp(..)
+  , BinOp(..)
+  , UnOp(..)
+  )
+import SymbolTable (
+    SymbolTable(..)
+  , varType
+  , deepLookup
+  )
 
 mapOp :: [(Type, Type, Type)]
-mapOp =  [(IntType, SetType, SetType), (SetType, IntType, SetType)]
+mapOp =  [ (IntType, SetType, SetType)
+         , (SetType, IntType, SetType)
+         ]
 
 intOp :: [(Type, Type, Type)]
 intOp =  [(IntType, IntType, IntType )]
@@ -19,10 +31,10 @@ setOp =  [(SetType, SetType, SetType)]
 relOp :: [(Type, Type, Type)]
 relOp =  [(IntType, IntType, BoolType)]
 
-compOp :: [(Type, Type, Type) ]
-compOp =  [(SetType,  SetType,  BoolType)
-          ,(IntType,  IntType,  BoolType)
-          ,(BoolType, BoolType, BoolType)
+compOp :: [(Type, Type, Type)]
+compOp =  [ (SetType,  SetType,  BoolType)
+          , (IntType,  IntType,  BoolType)
+          , (BoolType, BoolType, BoolType)
           ]
 
 atOp :: [(Type, Type, Type)]
@@ -74,15 +86,18 @@ unCheck a (b, c) =
     then [c]
   else []
 
+
 expType :: [SymbolTable] -> Exp -> Type
+
+-- Binary Operation --
 expType sts (Binary binOp exp0 exp1) =
   if null matches
-    then error' pos (
-      "Operator " ++ show binOp ++ " expects\n    " ++ (
-        concat $ intersperse " or\n    " (map show' expected)
-      ) ++
-      "\nbut received\n    " ++ show type0 ++ ", " ++ show type1
-      )
+    then TypeError $ concat [s | TypeError s <- [type0, type1]] ++ [
+      show pos ++ " Operator " ++ show binOp ++ " expects\n    " ++ margin ++ (
+        intercalate (" or\n    " ++ margin) (map show' expected)
+      ) ++ "\n" ++ margin ++
+      "but received\n    " ++ margin ++ show type0 ++ ", " ++ show type1
+    ]
     else head matches
   where
     matches         = (binCheck type0 type1) =<< expected
@@ -91,38 +106,59 @@ expType sts (Binary binOp exp0 exp1) =
     expected        = binType binOp
     show' (x, y, _) = show x ++ ", " ++ show y
     pos             = getPosB binOp
+    margin   = replicate (8 + (length $ show pos)) ' '
 
 
+-- Unary Operation --
 expType sts (Unary unOp exp0) =
   if null matches
-    then error' pos (
-      "Operator " ++ show unOp ++ "expects\n    " ++
-      show expected ++ "\nbut received\n    " ++ show type0
-      )
+    then TypeError $ concat [s | TypeError s <- [type0]] ++ [
+      show pos ++ " Operator " ++ show unOp ++ " expects\n    " ++ margin ++ (
+        intercalate (" or\n    " ++ margin) (map show' expected)
+      ) ++ "\n" ++ margin ++ "but received\n    " ++ margin ++
+      show type0
+    ]
     else head matches
   where
-    matches  = (unCheck type0) =<< expected
-    type0    = expType sts exp0
-    expected = unType unOp
-    pos      = getPosU unOp
+    matches      = (unCheck type0) =<< expected
+    type0        = expType sts exp0
+    expected     = unType unOp
+    show' (x, _) = show x
+    pos          = getPosU unOp
+    margin       = replicate (8 + (length $ show pos)) ' '
 
+
+-- Set Expression --
 expType sts (Set exps pos) =
-  if all (\x -> expType sts x == IntType) exps
-    then SetType
-    else error' pos (
-      "Set can only have integer values"
-    )
+  if null errors
+    then if all (\x -> expType sts x == IntType) exps
+      then SetType
+      else TypeError [setError]
+    else TypeError (setError : errors)
+  where
+    errors = concat [ s | TypeError s <- map (expType sts) exps ]
+    setError =
+      show pos ++ " Set can only have integer values."
 
-expType _ (IntConst _)  = IntType
 
+-- Boolean Constant --
 expType _ (BoolConst _) = BoolType
 
+
+-- Integer Constant --
+expType _ (IntConst _)  = IntType
+
+
+-- String Constant --
 expType _ (StrConst _)  = StrType
 
-expType sts (Var (Id var pos))   =
-  if isNothing varDef
-    then error' pos (
-      "Variable `" ++ var ++ "` not declared in this scope."
-    )
-    else varType $ fromJust varDef
-  where varDef = deepLookup var sts
+
+-- Variable Expression --
+expType sts (Var (Id var pos)) =
+  case varDef of
+    Nothing -> TypeError
+      [ show pos ++ " Variable `" ++ var ++ "` not declared in this scope."
+      ]
+    Just x -> varType x
+  where
+    varDef = deepLookup var sts

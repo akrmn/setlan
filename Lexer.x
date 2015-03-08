@@ -1,11 +1,11 @@
 {
 module Lexer
 ( lexer
-, printError
 , alexScanTokens
 ) where
 
-import Tokens
+import Tokens (Pos(..), Token(..), isTokenError, printError)
+
 }
 
 %wrapper "posn"

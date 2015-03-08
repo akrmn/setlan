@@ -2,11 +2,20 @@
 module Parser
 ( parser
 , parsr
-, tp
 ) where
-import Tokens
-import AST
-import Lexer
+
+import Tokens (Pos(..), Token(..), isTokenError, printError, tp)
+import AST ( Program(..)
+           , Inst(..)
+           , Direction(..)
+           , Declare(..)
+           , Type(..)
+           , Id(..)
+           , Exp(..)
+           , BinOp(..)
+           , UnOp(..)
+           )
+import Lexer (alexScanTokens)
 }
 
 %name parsr
@@ -192,9 +201,9 @@ Inst
   | '{' using Declares in Insts '}'         {Block $3 $5 (tp $1)}
   | '{' Insts '}'                           {Block [] $2 (tp $1)}
 
-  | scan Name                               {Scan    $2                     (tp $1)}
-  | print Conts                             {Print   $2                     (tp $1)}
-  | println Conts                           {Print  ($2 ++ [StrConst "\n"]) (tp $1)}
+  | scan Name                               {Scan   $2           (tp $1)}
+  | print Conts                             {Print  $2           (tp $1)}
+  | println Conts                           {Print ($2 ++ [nln]) (tp $1)}
 
   | if '(' Exp ')' Inst else Inst           {If  $3 $5 (Just $7) (tp $1)}
   | if '(' Exp ')' Inst  %prec then         {If  $3 $5 Nothing   (tp $1)}
@@ -210,10 +219,10 @@ Dir
   | max                                     {Max}
 
 Declares
-  : Declare ';' Declares                    {$1 : $3}
-  | Declare ';'                             {[$1]}
+  : Declare ';' Declares                    {$1 ++ $3}
+  | Declare ';'                             {$1}
 
-Declare : Type Names                        {Declare $1 $2}
+Declare : Type Names                        {map (Declare $1) $2}
 
 Type
   : bool                                    {BoolType}
@@ -228,15 +237,15 @@ Name
 
 {
 
-tp :: Token -> Pos
-tp = token_posn
-
 extract :: Token -> String
 extract (TokenString s _) = s
 extract (TokenIdent s _)  = s
 
 extract' :: Token -> Int
 extract' (TokenInt n _) = n
+
+nln :: Exp
+nln = StrConst "\n"
 
 parseError :: [Token] -> a
 parseError l = case l of
