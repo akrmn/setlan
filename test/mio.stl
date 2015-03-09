@@ -4,10 +4,17 @@ program {
         int a, b;
     in
 
-    {{
+    repeat {
+        print "say a > ";
         scan a;
+        print "say b > ";
         scan b;
-    };};
+    } while (a == 0 or b == 0) do {
+        print "say GOOD a > ";
+        scan a;
+        print "say GOOD b > ";
+        scan b;
+    };
 
     x = {a, b, a + b, a - b, a * b, a / b, a % b};
     println x;

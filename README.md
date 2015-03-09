@@ -22,5 +22,3 @@ kept, meaning that both `3 <-> {4}` and `{3} <-> 4` are valid, (and give
 different results).
 
 When a boolean value is scanned, it must be capitalized (Haskell).
-
-RWD loops appear to be buffered (probably Haskell).

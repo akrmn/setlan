@@ -30,11 +30,19 @@ import Prelude hiding (lookup)
 
 import AST (Inst(..), Type(..), tabs)
 
-data ScopeType = ProgramScope | BlockScope | ForScope deriving (Eq)
+data ScopeType
+  = ProgramScope
+  | WhileScope
+  | IfScope
+  | BlockScope
+  | ForScope
+  deriving (Eq)
 
 instance Show ScopeType where
   show x = case x of
     ProgramScope -> "Program"
+    WhileScope   -> "While"
+    IfScope      -> "If"
     BlockScope   -> "Block"
     ForScope     -> "For"
 

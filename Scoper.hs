@@ -170,10 +170,16 @@ scoper' sts (Print exps pos) =
 
 -- If Instruction --
 scoper' sts (If cond thn els pos) =
-  ( thnScopes ++ elsScopes
+  ( [ifScope]
   , ifErrors ++ thnErrors ++ elsErrors
   )
   where
+    ifScope = SymbolTable
+      { scopeType    = IfScope
+      , variables    = Map.empty
+      , daughters    = thnScopes ++ elsScopes
+      , instructions = []
+      }
     (thnScopes, thnErrors) = scoper' sts thn
     (elsScopes, elsErrors) =
       case els of
@@ -197,10 +203,16 @@ scoper' sts (If cond thn els pos) =
 
 -- RWD Instruction --
 scoper' sts (RWD r cond d pos) =
-  ( rScopes ++ dScopes
+  ( [whileScope]
   , rErrors ++ wErrors ++ dErrors
   )
   where
+    whileScope = SymbolTable
+      { scopeType    = WhileScope
+      , variables    = Map.empty
+      , daughters    = rScopes ++ dScopes
+      , instructions = []
+      }
     (rScopes, rErrors) =
       case r of
         Just r' -> scoper' sts r'

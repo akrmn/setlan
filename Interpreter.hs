@@ -22,6 +22,7 @@ import Data.Maybe (fromJust)
 import Data.List (elemIndex)
 import Control.Monad.Trans (lift)
 import Control.Monad.Trans.State (StateT, get, put, evalStateT)
+import System.IO (hFlush, stdout)
 
 import Tokens (Pos(..), isTokenError, printError)
 import Lexer (alexScanTokens)
@@ -113,6 +114,8 @@ execute (Block declares insts pos) =
     hasScope :: Inst -> Bool
     hasScope (Block _ _ _) = True
     hasScope (For _ _ _ _ _) = True
+    hasScope (If _ _ _ _) = True
+    hasScope (RWD _ _ _ _) = True
     hasScope _ = False
 
 -- Scan Instruction --
@@ -154,6 +157,7 @@ execute (Print exps pos) =
     sts <- get
     let evaluated = concat $ map show $ map (evaluate sts) exps
     lift $ putStr evaluated
+    lift $ hFlush stdout
 
 
 -- If Instruction --
@@ -177,7 +181,11 @@ execute rwd@(RWD (Just r) cond (Just d) pos) =
     if c
       then do
         execute d
-        execute rwd
+        sts <- get
+        let BoolVar c' = evaluate sts cond
+        if c'
+          then  execute rwd
+          else return ()
       else return ()
 execute rw@(RWD (Just r) cond Nothing pos) =
   do
