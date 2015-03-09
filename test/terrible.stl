@@ -1,0 +1,37 @@
+program {{
+    using int a; set b; bool c; in
+
+    print a, b <+> a;
+
+    b = {1,2,3,4};
+
+    for i min b do {
+        a = 10;
+        print a;
+        a = i + 1;
+    };
+
+    if (a @ b and c)
+        print b
+    ;
+
+    repeat {
+        using int i; in
+        print i;
+    } while (true) do {
+        scan a;
+    };
+};}
+
+# ERROR: variable 'a' of type 'set' at line 2, column 22 has already been defined with type 'int' at line 2, column 15
+# ERROR: variable 'b' of type 'bool' at line 2, column 33 has already been defined with type 'set' at line 2, column 25
+# ERROR: scanning variable 'a' of type 'set' at line 4, column 23
+# ERROR: operator '+' used incorrectly with types 'set' and 'int' at line 6, column 14
+# ERROR: expecting expression of type 'set' and got type 'int' at line 10, column 15
+# ERROR: assigning value to not modifiable variable 'i' at line 11, column 9
+# ERROR: assigning value to not modifiable variable 'i' at line 13, column 9
+# ERROR: variable 'i' referenced at line 16, column 9 is not defined
+# ERROR: operator 'and' used incorrectly with types 'bool' and 'int' at line 16, column 9
+# ERROR: operator '+' used incorrectly with types 'bool' and 'int' at line 23, column 14
+# ERROR: expecting expression of type 'bool' and got type 'int' at line 23, column 14
+# ERROR: variable 'i' referenced at line 24, column 14 is not defined

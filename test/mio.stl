@@ -1,0 +1,24 @@
+program {
+    using
+        set x, y;
+        int a, b;
+    in
+
+    scan a;
+    scan b;
+
+    x = {a, b, a + b, a - b, a * b, a / b, a % b};
+    println x;
+    y = {a, b, b + a, b - a, b * a, b / a, b % a};
+    println y;
+
+    # esto se asocia: (a <+> y) ++ (b <+> x) ++ y ++ x
+    println a <+> y;
+    println b <+> x;
+
+    for i max a <+> y ++ b <+> x ++ y ++ x do
+        print i, ", "
+    ;
+
+    print "done.";
+}

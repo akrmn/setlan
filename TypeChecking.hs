@@ -159,6 +159,6 @@ expType sts (Var (Id var pos)) =
     Nothing -> TypeError
       [ show pos ++ " Variable `" ++ var ++ "` not declared in this scope."
       ]
-    Just x -> varType x
+    Just (x, _) -> varType x
   where
     varDef = deepLookup var sts

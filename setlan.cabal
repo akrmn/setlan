@@ -22,7 +22,9 @@ executable setlan
   build-depends:       base >=4.7 && <4.8,
                        array >=0.5,
                        containers >=0.5.5.1,
-                       safe >=0.3.8
+                       safe >=0.3.8,
+                       monads-tf >=0.1.0.2,
+                       transformers >=0.4.2.0
   build-tools:         alex,
                        happy
   -- hs-source-dirs:

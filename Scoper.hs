@@ -43,18 +43,29 @@ scoper text name = do
   let toks = alexScanTokens text
   if any isTokenError toks
     then mapM_ printError $ filter isTokenError toks
-    else putStr . scoper'' . parsr $ toks
+    else
+      let scope = scoper'' . parsr $ toks
+      in case scope of
+        Left error -> putStr error
+        Right st   -> putStr (show st)
   putStrLn ""
 
-scoper'' :: Program -> String
+scoper'' :: Program -> Either String SymbolTable
 scoper'' (Program inst) =
   if null errors
-    then if null scopes
-      then "No Scopes"
-      else show $ head scopes
-   else "ERROR: " ++ (intercalate "\nERROR: " errors)
+    then if (length scopes > 1)
+      then Left "WTF" -- shouldn't ever get here
+      else Right programST
+   else Left $ "ERROR: " ++ (intercalate "\nERROR: " errors)
   where
     (scopes, errors) = scoper' [] inst
+    programST =
+      SymbolTable
+        { scopeType    = ProgramScope
+        , variables    = Map.empty
+        , daughters    = scopes
+        , instructions = [inst]
+        }
 
 type VarMap = Map.Map String Variable
 
@@ -77,10 +88,10 @@ getVars' vars ((Declare t (Id name pos)) : xs) =
       (vars'', errors) = getVars' vars' xs
       vars' = Map.insert name (
         case t of
-          BoolType -> BoolVar False     BlockScope
-          IntType  -> IntVar  0         BlockScope
-          SetType  -> SetVar  Set.empty BlockScope
-          StrType  -> StrVar  ""        BlockScope
+          BoolType -> BoolVar False
+          IntType  -> IntVar  0
+          SetType  -> SetVar  Set.empty
+          StrType  -> StrVar  ""
         ) vars
       in (vars'', errors)
 
@@ -91,8 +102,8 @@ scoper' sts (Assign (Id name _) value pos) =
   ([], errors)
   where
     varDef = deepLookup name sts
-    scope  = scopeType (fromJust varDef)
-    lType  = varType (fromJust varDef)
+    scope  = snd (fromJust varDef)
+    lType  = varType (fst $ fromJust varDef)
     rType  = expType sts value
     errors =
       if isNothing varDef
@@ -122,7 +133,8 @@ scoper' sts (Block declares insts pos) =
   )
   where
     blockScope = SymbolTable
-      { variables    = vars
+      { scopeType    = BlockScope
+      , variables    = vars
       , daughters    = daughterScopes
       , instructions = insts
       }
@@ -138,7 +150,7 @@ scoper' sts (Scan (Id name _) pos) =
   where
     errors = case varDef of
       Nothing -> [errorUndeclared]
-      Just x -> case varType x of
+      Just (x,_) -> case varType x of
         SetType -> [errorScanSet]
         _ -> []
     varDef = deepLookup name sts
@@ -218,7 +230,8 @@ scoper' sts (For (Id name _) _ range inst pos) =
   )
   where
     forScope = SymbolTable
-      { variables    = Map.singleton name (IntVar 0 ForScope)
+      { scopeType    = ForScope
+      , variables    = Map.singleton name (IntVar 0)
       , daughters    = daughterScopes
       , instructions = [inst]
       }
