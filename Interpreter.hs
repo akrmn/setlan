@@ -20,8 +20,8 @@ import qualified Data.Set as Set (
   )
 import Data.Maybe (fromJust)
 import Data.List (elemIndex)
-import Control.Monad.Trans
-import Control.Monad.Trans.State
+import Control.Monad.Trans (lift)
+import Control.Monad.Trans.State (StateT, get, put, evalStateT)
 
 import Tokens (Pos(..), isTokenError, printError)
 import Lexer (alexScanTokens)
@@ -35,13 +35,14 @@ import AST(
   , Type(..)
   )
 import Parser (parsr)
-import SymbolTable --(
---    Variable(..)
---  , SymbolTable(..)
---  --, ScopeType(..)
---  , deepLookup
---  , varType
---  )
+import SymbolTable (
+    Variable(..)
+  , SymbolTable(..)
+  , update
+  , deepLookup
+  , deepUpdate
+  , varType
+  )
 import Scoper (scoper'')
 
 type Executor a = StateT [SymbolTable] IO a

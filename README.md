@@ -11,11 +11,16 @@ We chose Haskell for its powerful functional notation, and because of the
 ease of use of the tools Alex and Happy.
 
 ### Current Status
-The Parser and Lexer are working as expected.
+Everything is working as expected.
 
 ### Problems?
 None yet.
 
 ### Other comments
-The output format is not identical to the one in the project statement, but the
-infomation it presents is equivalent.
+The original double meaning for the map operators (<+>, <->, <*>, </>, <%>) was
+kept, meaning that both `3 <-> {4}` and `{3} <-> 4` are valid, (and give
+different results).
+
+When a boolean value is scanned, it must be capitalized (Haskell).
+
+RWD loops appear to be buffered (probably Haskell).
