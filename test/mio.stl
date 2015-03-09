@@ -4,8 +4,10 @@ program {
         int a, b;
     in
 
-    scan a;
-    scan b;
+    {{
+        scan a;
+        scan b;
+    };};
 
     x = {a, b, a + b, a - b, a * b, a / b, a % b};
     println x;

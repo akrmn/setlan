@@ -97,9 +97,13 @@ execute (Block declares insts pos) =
     execute' sts insts b@(Block _ _ _) = do
       put $ ((daughters $ head sts) !! (fromJust $ elemIndex b insts')):sts
       execute b
+      sts <- get
+      put (tail sts)
     execute' sts insts f@(For _ _ _ _ _) = do
       put $ ((daughters $ head sts) !! (fromJust $ elemIndex f insts')):sts
       execute f
+      sts <- get
+      put (tail sts)
     execute' sts _ i = do
       put sts
       execute i
